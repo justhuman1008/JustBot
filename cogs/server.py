@@ -45,6 +45,18 @@ class server(commands.Cog):
         await ctx.respond(embed=guild_info)
 
 
+    @slash_command(guild_ids = [setting.test_guild], description="내 디스코드 정보를 불러옵니다.")
+    async def 내정보(self, ctx):
+        user_info = discord.Embed(title=f"{ctx.author.name}#{ctx.author.discriminator}", colour=0xffdc16)
+        user_info.add_field(name="별명", value="`"+ctx.author.display_name+"`", inline=True)
+        user_info.add_field(name="유저 ID", value="`"+str(ctx.author.id)+"`", inline=True)
+        user_info.add_field(name="역할", value="`"+str(ctx.author.top_role)+"`", inline=True)
+        user_info.add_field(name="계정 생성일", value="`"+str(ctx.author.created_at.strftime("%Y %B %d %a"))+"`", inline=True)
+        user_info.add_field(name="서버 참가일", value="`"+str(ctx.author.joined_at.strftime("%Y %B %d %a"))+"`", inline=True)
+        user_info.set_thumbnail(url=ctx.author.display_avatar)
+        await ctx.respond(embed=user_info)
+
+        
     @slash_command(guild_ids = [setting.test_guild], description="채널의 메시지를 대량으로 삭제합니다.")
     @commands.has_permissions(manage_messages=True)
     async def 청소(self, ctx, 삭제수량 : int):
@@ -95,18 +107,6 @@ class server(commands.Cog):
             ban.add_field(name=f"사유", value=f"{reason}", inline=False)
             ban.set_thumbnail(url=member.display_avatar)
             await ctx.respond(embed=ban)
-
-
-    @slash_command(guild_ids = [setting.test_guild], description="내 디스코드 정보를 불러옵니다.")
-    async def 내정보(self, ctx):
-        user_info = discord.Embed(title=f"{ctx.author.name}#{ctx.author.discriminator}", colour=0xffdc16)
-        user_info.add_field(name="별명", value="`"+ctx.author.display_name+"`", inline=True)
-        user_info.add_field(name="유저 ID", value="`"+str(ctx.author.id)+"`", inline=True)
-        user_info.add_field(name="역할", value="`"+str(ctx.author.top_role)+"`", inline=True)
-        user_info.add_field(name="계정 생성일", value="`"+str(ctx.author.created_at.strftime("%Y %B %d %a"))+"`", inline=True)
-        user_info.add_field(name="서버 참가일", value="`"+str(ctx.author.joined_at.strftime("%Y %B %d %a"))+"`", inline=True)
-        user_info.set_thumbnail(url=ctx.author.display_avatar)
-        await ctx.respond(embed=user_info)
 
 
     @slash_command(guild_ids = [setting.test_guild], description="이 서버의 초대링크를 생성합니다.")

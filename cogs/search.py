@@ -164,75 +164,81 @@ class search(commands.Cog):
         await ctx.respond(embed=covid19)
 
 
-    @slash_command(guild_ids = [setting.test_guild], description="메세지를 번역합니다.")
-    async def 번역(self, ctx, 번역할단어):
+    @slash_command(guild_ids = [setting.test_guild], description="메세지를 번역합니다. [5000자 제한]")
+    async def 번역(self, ctx, 번역할내용):
+        languagebox = {"ko":"한국어", "en":"영어", "ja":"일본어", "zh-CN":"중국어 간체", "zh-TW":"중국어 번체", "vi":"베트남어", "id":"인도네사아어", "th":"태국어", "de":"독일어", "ru":"러시아어", "es":"스페인어", "it":"이탈리아어", "fr":"프랑스어"}
+        unlanguagebox = { y:x for x,y in languagebox.items()}
+
         client_id = setting.NaverAPIID
         client_secret = setting.NaverAPIPW
-        Text = urllib.parse.quote(번역할단어)
 
-        data = "query=" + Text
-        url = "https://openapi.naver.com/v1/papago/detectLangs"
-        request = urllib.request.Request(url)
-        request.add_header("X-Naver-Client-Id",client_id)
-        request.add_header("X-Naver-Client-Secret",client_secret)
-        print(request)
-        print(url)
-        response = urllib.request.urlopen(request, data=data.encode("utf-8"))
-        rescode = response.getcode()
-        if(rescode==200):
-            response_body1 = response.read()
-            res1 = json.loads(response_body1.decode('utf-8'))
-            befcode = res1['langCode']
+        class selector(discord.ui.View):
+            @discord.ui.select(placeholder="번역될 언어를 선택하세요",min_values=1,max_values=1,options=[
+                    discord.SelectOption(label="한국어",description="한국어",emoji="🇰🇷"),
+                    discord.SelectOption(label="영어",description="English",emoji="🇬🇧"),
+                    discord.SelectOption(label="일본어",description="日本語",emoji="🇯🇵"),
+                    discord.SelectOption(label="중국어 간체",description="中国人",emoji="🇨🇳"),
+                    discord.SelectOption(label="중국어 번체",description="中國人",emoji="🇹🇼"),
+                    discord.SelectOption(label="독일어",description="Deutsch",emoji="🇩🇪"),
+                    discord.SelectOption(label="프랑스어",description="불어 | Français",emoji="🇫🇷"),
+                    discord.SelectOption(label="러시아어",description="Русский",emoji="🇷🇺"),
+                    discord.SelectOption(label="스페인어",description="에스파냐어 | español",emoji="🇪🇸"),
+                    discord.SelectOption(label="이탈리아어",description="Italiano",emoji="🇮🇹"),
+                    discord.SelectOption(label="베트남어",description="Tiếng Việt",emoji="🇻🇳"),
+                    discord.SelectOption(label="인도네사아어",description="Bahasa Indonesia",emoji="🇮🇩"),
+                    discord.SelectOption(label="태국어",description="ภาษาไทย",emoji="🇹🇭")
+            ])
 
-        if befcode == "ko":
-            before = "한국어"
-        elif befcode == "en":
-            before = "영어"
-        elif befcode == "ja":
-            before = "일본어"
-        elif befcode == "zh-CN":
-            before = "중국어 간체"
-        elif befcode == "zh-TW":
-            before = "중국어 번체"
-        elif befcode == "vi":
-            before = "베트남어"
-        elif befcode == "id":
-            before = "인도네사아어"
-        elif befcode == "th":
-            before = "태국어"
-        elif befcode == "de":
-            before = "독일어"
-        elif befcode == "ru":
-            before = "러시아어"
-        elif befcode == "es":
-            before = "스페인어"
-        elif befcode == "it":
-            before = "이탈리아어"
-        elif befcode == "fr":
-            before = "프랑스어"
+            async def dropreturn(self, select, interaction: discord.Interaction):
+                await dropdown.edit_original_message(content=f"{select.values[0]}로 번역합니다.",view=None)
+                beforelang = select.values[0]
+                after_langcode = unlanguagebox[select.values[0]]
 
-        aftcode = "en"
+                Text = urllib.parse.quote(번역할내용)
 
-        data = f"source={befcode}&target={aftcode}&text=" + Text
-        url = "https://openapi.naver.com/v1/papago/n2mt"
-        request = urllib.request.Request(url)
-        request.add_header("X-Naver-Client-Id",client_id)
-        request.add_header("X-Naver-Client-Secret",client_secret)
-        response = urllib.request.urlopen(request, data=data.encode("utf-8"))
-        rescode = response.getcode()
-        if(rescode==200):
-            response_body2 = response.read()
-            res2 = json.loads(response_body2.decode('utf-8'))
-            after = res2['message']['result']['translatedText']
-            print(res2)
+                # 언어 감지
+                data = "query=" + Text
+                url = "https://openapi.naver.com/v1/papago/detectLangs"
+                request = urllib.request.Request(url)
+                request.add_header("X-Naver-Client-Id",client_id)
+                request.add_header("X-Naver-Client-Secret",client_secret)
+                response = urllib.request.urlopen(request, data=data.encode("utf-8"))
+                rescode = response.getcode()
+                if(rescode==200):
+                    response_body1 = response.read()
+                    res1 = json.loads(response_body1.decode('utf-8'))
+                    before_langcode = res1['langCode']
+                beforelang = languagebox[before_langcode]
+                afterlang = languagebox[after_langcode]
 
-            papago = discord.Embed(title=f"번역기", description=f"­", colour=0xffdc16)
-            papago.add_field(name=f"{before}", value=f"{번역할단어}", inline=False)
-            papago.add_field(name=f"번역후", value=f"{after}", inline=False)
-            papago.set_thumbnail(url='https://cdn.discordapp.com/attachments/955355332983521300/958683584284229672/papagonobg.png')
-            await ctx.respond(embed=papago)
-        else:
-            print("Error Code:" + rescode)
+                if beforelang == afterlang:
+                    samelang = discord.Embed(title=f"동일한 언어가 선택되었습니다.", description=f"{번역할내용}은(는) {beforelang}로 {번역할내용}(...)입니다.", colour=0xffdc16)
+                    await dropdown.edit_original_message(embed=samelang,content=None)
+                    return
+
+        
+                data = f"source={before_langcode}&target={after_langcode}&text=" + Text
+                url = "https://openapi.naver.com/v1/papago/n2mt"
+                request = urllib.request.Request(url)
+                request.add_header("X-Naver-Client-Id",client_id)
+                request.add_header("X-Naver-Client-Secret",client_secret)
+                response = urllib.request.urlopen(request, data=data.encode("utf-8"))
+                rescode = response.getcode()
+                if(rescode==200):
+                    response_body2 = response.read()
+                    res2 = json.loads(response_body2.decode('utf-8'))
+                    after = res2['message']['result']['translatedText']
+
+                    papago = discord.Embed(title=f"번역기", description=f"­", colour=0xffdc16)
+                    papago.add_field(name=f"{beforelang}", value=f"{번역할내용}", inline=False)
+                    papago.add_field(name=f"{afterlang}", value=f"{after}", inline=False)
+                    papago.set_thumbnail(url='https://cdn.discordapp.com/attachments/955355332983521300/958683584284229672/papagonobg.png')
+                    await dropdown.edit_original_message(embed=papago,content=None)
+                else:
+                    print("Error Code:" + rescode)
+
+
+        dropdown = await ctx.respond("입력한 내용이 번역될 언어를 선택하세요.", view=selector())
 
 
 def setup(bot):
