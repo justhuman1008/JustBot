@@ -4,7 +4,7 @@ from discord.ext import tasks
 import os
 from itertools import cycle
 
-from setting import test_guild, token, owner
+from setting import token, owner, test_guild
 
 bot = discord.Bot()
 
@@ -65,8 +65,12 @@ async def 도움말(ctx, 플러그인:Option(str,"다음 중 하나를 선택하
     searchhelp.set_thumbnail(url='https://cdn.discordapp.com/attachments/955355332983521300/959761638217629696/pngegg.png')
 
     minecrafthelp = discord.Embed(title=f"마인크래프트 도움말", description=f"­", colour=0xffdc16)
+    searchhelp.set_thumbnail(url='https://cdn.discordapp.com/attachments/955355332983521300/960085353404964884/minecraft.png')
 
     playthelp = discord.Embed(title=f"놀이 도움말", description=f"­", colour=0xffdc16)
+    playthelp.add_field(name=f"/따라하기 `<따라할말>`", value=f":small_blue_diamond:"+"유저가 한 말을 따라합니다.", inline=False)
+    playthelp.add_field(name=f"/주사위", value=f":small_blue_diamond:"+"주사위를 하나 던집니다.", inline=False)    
+    playthelp.set_thumbnail(url='https://cdn.discordapp.com/attachments/955355332983521300/960057531512799242/lego.png')
 
     if 플러그인 == None:
         await ctx.respond(embed=help)

@@ -7,7 +7,6 @@ from bs4 import BeautifulSoup
 import requests
 import urllib
 from urllib.request import urlopen, Request
-import furl
 import json
 from datetime import date, timedelta
 
@@ -59,57 +58,80 @@ class search(commands.Cog):
     @slash_command(guild_ids = [setting.test_guild], description="해당 지역의 날씨를 불러옵니다.")
     async def 날씨(self, ctx, 지역명):
         try:
+            # 네이버 연결
             enc_location = urllib.parse.quote(지역명+'날씨')
             hdr = {'User-Agent': 'Mozilla/5.0'}
-            url = 'https://search.naver.com/search.naver?where=nexearch&sm=top_hty&fbm=1&ie=utf8&query=' + enc_location
+            url = f'https://search.naver.com/search.naver?where=nexearch&sm=top_hty&fbm=1&ie=utf8&query={enc_location}'
             req = Request(url, headers=hdr)
             html = urllib.request.urlopen(req)
             bsObj = BeautifulSoup(html, "html.parser")
+            weatherbox = bsObj.find('section', {'class': 'sc_new cs_weather_new _cs_weather'}) # 날씨 박스
 
-            area = bsObj.find('h2', {'class': 'title'}) # 지역명
-            area = area.text
+            area = weatherbox.find('h2', {'class': 'title'}).get_text() # 지역명
 
-            Temp = bsObj.find('div', {'class': 'temperature_text'}).get_text() # 현재 온도
+            Temp = weatherbox.find('div', {'class': 'temperature_text'}).get_text() # 현재 온도
             find_num = Temp.find('도')+1
             Temp = Temp[find_num:]
 
-            MXLW_Temp = bsObj.find('div', {'class': 'cell_temperature'}).get_text() # 오늘 최저/최고 온도
-            MXLW_Temp = MXLW_Temp.replace("기온","기온: ")
+            MXLW_Temp = weatherbox.find('div', {'class': 'cell_temperature'}).get_text() # 오늘 최저/최고 온도
+            MXLW_Temp = MXLW_Temp.replace("기온",": ")
 
-            Cast = bsObj.find('p', {'class': 'summary'}).get_text() # 기상정보 요약
-            Cast = Cast.replace("기온","기온: ")
+            Cast = weatherbox.find('p', {'class': 'summary'}).get_text() # 기상정보 요약
             Cast = Cast.replace("요","요 / ")
-            if Cast.find('높아요') > -1:
-                Cast = Cast.replace('높아요', '낮아요')
-            elif Cast.find('낮아요') > -1:
-                rainper = Cast.replace('낮아요', '높아요')
 
-            rainper = bsObj.select('dd', {'class': 'desc'})[0].get_text() # 강수확률
-            vapor = bsObj.select('dd', {'class': 'desc'})[1].get_text() # 습도
+            rainper = weatherbox.select('dd', {'class': 'desc'})[0].get_text() # 강수확률
+            vapor = weatherbox.select('dd', {'class': 'desc'})[1].get_text() # 습도
+            wind = weatherbox.select('dd', {'class': 'desc'})[2].get_text() # 바람
+
+            Sunlight = weatherbox.find('li', {'class': 'item_today level3'}).get_text()# 자외선지수
+            Sunlight = Sunlight.replace("  자외선 ","")
+
+            dust1 = weatherbox.select('span', {'class': 'txt'})[13].get_text()# 미세먼지
+            dust2 = weatherbox.select('span', {'class': 'txt'})[14].get_text()# 초미세먼지
+            dust = dust1+dust2
+            #dust = dust.replace("먼지", "먼지: ")
+
 
             weather = discord.Embed(title=area+ ' 날씨 정보', description=f'[네이버 날씨 바로가기]({url})', color=0xffdc16)
-            weather.add_field(name="현재 상태",value=Cast)
-            weather.add_field(name='현재 온도', value=Temp+'C', inline=False)
-            weather.add_field(name='오늘 최저/최고 기온', value=MXLW_Temp, inline=False)
+            weather.add_field(name="현재 상태",value=Cast, inline=False)
+            weather.add_field(name='현재 온도', value=Temp+'C⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀', inline=True)
+            weather.add_field(name='오늘 최저/최고 기온', value=MXLW_Temp, inline=True)
             weather.add_field(name='현재 강수확률', value=rainper, inline=False)
-            weather.add_field(name='현재 습도', value=vapor, inline=False)
-            weather.set_thumbnail(url='https://cdn.discordapp.com/attachments/955355332983521300/955382933546479636/pngwing.com.png')
+            weather.add_field(name='습도', value=vapor, inline=True)
+            weather.add_field(name='바람', value=wind, inline=True)
+            weather.add_field(name='자외선', value=Sunlight, inline=True)
+            weather.add_field(name='미세먼지', value=f"미세먼지: {dust1}/ 초미세먼지: {dust2}", inline=False)
+            weather.set_thumbnail(url='https://cdn.discordapp.com/attachments/731471072310067221/867995043473018950/pngwing.com.png')
+
+
+
+            Sunset = bsObj.find('li', {'class': 'item_today type_sun'}).get_text() # 자외선지수
+            print(f' -일몰시간 로드에 성공하였습니다.[{Sunset}]')
 
             if Cast.find("맑음") > -1:
-                weather.set_thumbnail(url='https://cdn.discordapp.com/attachments/955355332983521300/955383039800774686/01.png')
+                weather.set_thumbnail(url='https://cdn.discordapp.com/attachments/731471072310067221/882529428054368316/01.png')
+                print(' -날씨 인식후 이미지를 변경하였습니다.(맑음)')
             elif Cast.find("흐림") > -1:
-                weather.set_thumbnail(url='https://cdn.discordapp.com/attachments/955355332983521300/955383169060855830/07.png')
+                weather.set_thumbnail(url='https://cdn.discordapp.com/attachments/731471072310067221/881831929127776327/07.png')
+                print(' -날씨 인식후 이미지를 변경하였습니다.(흐림)')
             elif Cast.find("구름많음") > -1:
-                weather.set_thumbnail(url='https://cdn.discordapp.com/attachments/955355332983521300/955383269568946196/05.png')
+                weather.set_thumbnail(url='https://cdn.discordapp.com/attachments/731471072310067221/881831910626717696/05.png')
+                print(' -날씨 인식후 이미지를 변경하였습니다.(구름많음)')
             elif Cast.find("비") > -1:
-                weather.set_thumbnail(url='https://cdn.discordapp.com/attachments/955355332983521300/955383414821888000/09.png')
+                weather.set_thumbnail(url='https://cdn.discordapp.com/attachments/731471072310067221/881832630876778526/09.png')
+                print(' -날씨 인식후 이미지를 변경하였습니다.(비)')
+            else:
+                print('입력되지 않은 날씨추이로 인해 기본 날씨 이미지를 전송하였습니다.')
+
 
             await ctx.respond(embed=weather)
+            print(f'날씨 출력 완료')
         except:
-            weathererror = discord.Embed(title= "날씨 불러오기 실패", color=0xffdc16, description="아래의 내용을 확인해주세요")
-            weathererror.add_field(name=f"지역명이 `{지역명}`이(가) 맞는지 확인해주세요.", value=f"지역단위가 작다면(ex (읍,면,동)) `속한 지자체를 같이 입력`해보세요", inline=False)
-            weathererror.add_field(name="­네이버 검색이 작동하고 있는지 확인해주세요.", value="­", inline=False)
-            await ctx.respond(embed=weathererror)
+            print(f'`{지역명}`의 날씨 출력에 실패하였습니다.')
+            embed = discord.Embed(title= "날씨 불러오기 실패", color=0xffdc16, description="아래의 내용을 확인해주세요")
+            embed.add_field(name=f"지역명이 `{지역명}`이(가) 맞는지 확인해주세요.", value=f"지역단위가 작다면(ex (읍,면,동)) `속한 지자체를 같이 입력`해보세요", inline=False)
+            embed.add_field(name="­네이버 검색이 작동하고 있는지 확인해주세요.", value="­", inline=False)
+            await ctx.respond(embed=embed)
 
 
     @slash_command(guild_ids = [setting.test_guild], description="한강의 실시간 수온을 불러옵니다.")

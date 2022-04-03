@@ -3,7 +3,6 @@ from discord.commands import slash_command
 from discord.ext import commands
 from discord.utils import get
 import requests
-import time
 
 import setting
 
