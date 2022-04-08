@@ -1,12 +1,21 @@
 import discord
 from discord.commands import Option
 from discord.ext import tasks
-import os
+from os import listdir
 from itertools import cycle
+from sys import exit
 
 from setting import token, owner, test_guild
 
 bot = discord.Bot()
+
+
+if token == "":
+    print("=========================")
+    print("봇 계정 연결에 실패했습니다.")
+    print("디스코드 봇의 토큰을 입력해주세요.")
+    print("=========================")
+    exit()
 
 
 @bot.event # 봇 작동
@@ -16,28 +25,24 @@ async def on_ready():
     print(bot.user.name)
     print("연결에 성공했습니다.")
     print("=========================")
+    await bot.change_presence(activity=discord.Game("/도움말"))
 
-for filename in os.listdir('./cogs'): # Cogs 자동 로드(봇 작동시)
+for filename in listdir('./cogs'): # Cogs 자동 로드(봇 작동시)
     if filename.endswith('.py'):
         bot.load_extension(f'cogs.{filename[:-3]}')
         print(f'{filename[:-3]}가 정상적으로 로드되었습니다.')
 
 
-Status = cycle(['/help', 'Minecraft', '/help', '!help'])
-@tasks.loop(seconds=10) # 상태메시지 자동 변경
-async def change_status():
-    await bot.change_presence(activity=discord.Game(next(Status)))
-
 
 @bot.slash_command(guild_ids = [test_guild], description="봇 도움말 확인")
-async def 도움말(ctx, 플러그인:Option(str,"다음 중 하나를 선택하세요.", choices=["서버관리", "검색","마인크래프트", "놀이"])=None):
+async def 도움말(ctx, 플러그인:Option(str,"다음 중 하나를 선택하세요.", choices=["서버관리", "검색","마인크래프트", "자가진단", "놀이"])=None):
 
     help = discord.Embed(title=f"{bot.user.name} 도움말", description=f"­", colour=0xffdc16)
     help.add_field(name=f"서버관리", value=f"`/도움말 서버관리`", inline=True)
     help.add_field(name=f"검색", value=f"`/도움말 검색`", inline=True)
     help.add_field(name=f"마인크래프트", value=f"`/도움말 마인크래프트`", inline=True)
+    help.add_field(name=f"자가진단", value=f"`/도움말 자가진단`", inline=True)
     help.add_field(name=f"놀이", value=f"`/도움말 놀이`", inline=True)
-    help.add_field(name=f"5", value=f"`/도움말 5`", inline=True)
     help.set_thumbnail(url=bot.user.display_avatar)
 
     serverhelp = discord.Embed(title=f"서버관리 도움말", description=f"­", colour=0xffdc16)
@@ -57,20 +62,27 @@ async def 도움말(ctx, 플러그인:Option(str,"다음 중 하나를 선택하
     searchhelp = discord.Embed(title=f"검색 도움말", description=f"­", colour=0xffdc16)
     searchhelp.add_field(name=f"/구글 `<검색내용>`", value=f":small_blue_diamond:"+"구글에 검색합니다.", inline=False)
     searchhelp.add_field(name=f"/네이버 `<검색내용>`", value=f":small_blue_diamond:"+"네이버에 검색합니다.", inline=False)
-    searchhelp.add_field(name=f"/멜론차트", value=f":small_blue_diamond:"+"멜론 차트 TOP10을 불러옵니다.", inline=False)
-    searchhelp.add_field(name=f"/날씨 `<지역명>`", value=f":small_blue_diamond:"+"해당 지역의 날씨를 불러옵니다.", inline=False)
-    searchhelp.add_field(name=f"/한강수온", value=f":small_blue_diamond:"+"한강의 실시간 수온을 불러옵니다.", inline=False)
-    searchhelp.add_field(name=f"/코로나", value=f":small_blue_diamond:"+"대한민국의 코로나19 현황을 불러옵니다.", inline=False)
     searchhelp.add_field(name=f"/번역 `<번역할 내용>`", value=f":small_blue_diamond:"+"메세지를 번역합니다. [5000자 제한]", inline=False)
+    searchhelp.add_field(name=f"/코로나", value=f":small_blue_diamond:"+"대한민국의 코로나19 현황을 불러옵니다.", inline=False)
+    searchhelp.add_field(name=f"/날씨 `<지역명>`", value=f":small_blue_diamond:"+"해당 지역의 날씨를 불러옵니다.", inline=False)
+    searchhelp.add_field(name=f"/단축링크 `<URL>`", value=f":small_blue_diamond:"+"입력한 링크를 단축합니다.", inline=False)
+    searchhelp.add_field(name=f"/위키실검", value=f":small_blue_diamond:"+"나무위키의 실시간 검색어를 불러옵니다.", inline=False)
+    searchhelp.add_field(name=f"/멜론차트", value=f":small_blue_diamond:"+"멜론 차트 TOP10을 불러옵니다.", inline=False)
+    searchhelp.add_field(name=f"/한강수온", value=f":small_blue_diamond:"+"한강의 실시간 수온을 불러옵니다.", inline=False)
     searchhelp.set_thumbnail(url='https://cdn.discordapp.com/attachments/955355332983521300/959761638217629696/pngegg.png')
 
     minecrafthelp = discord.Embed(title=f"마인크래프트 도움말", description=f"­", colour=0xffdc16)
-    searchhelp.set_thumbnail(url='https://cdn.discordapp.com/attachments/955355332983521300/960085353404964884/minecraft.png')
+    minecrafthelp.set_thumbnail(url='https://cdn.discordapp.com/attachments/955355332983521300/960085353404964884/minecraft.png')
 
-    playthelp = discord.Embed(title=f"놀이 도움말", description=f"­", colour=0xffdc16)
-    playthelp.add_field(name=f"/따라하기 `<따라할말>`", value=f":small_blue_diamond:"+"유저가 한 말을 따라합니다.", inline=False)
-    playthelp.add_field(name=f"/주사위", value=f":small_blue_diamond:"+"주사위를 하나 던집니다.", inline=False)    
-    playthelp.set_thumbnail(url='https://cdn.discordapp.com/attachments/955355332983521300/960057531512799242/lego.png')
+    hcskrhelp = discord.Embed(title=f"자가진단 도움말", description=f"­", colour=0xffdc16)   
+    hcskrhelp.add_field(name=f"/자가진단 `<이름>` `<생년월일>` `<지역>` `<학교명>` `<학교분류>` `<비밀번호>`", value=f":small_blue_diamond:"+"교육부 자가진단을 진행합니다.", inline=False)
+    hcskrhelp.set_thumbnail(url='https://cdn.discordapp.com/attachments/955355332983521300/961565520451235840/hcskr.png')
+
+    playhelp = discord.Embed(title=f"놀이 도움말", description=f"­", colour=0xffdc16)
+    playhelp.add_field(name=f"/따라하기 `<따라할말>`", value=f":small_blue_diamond:"+"유저가 한 말을 따라합니다.", inline=False)
+    playhelp.add_field(name=f"/주사위", value=f":small_blue_diamond:"+"주사위를 하나 던집니다.", inline=False)    
+    playhelp.add_field(name=f"/숫자", value=f":small_blue_diamond:"+"1부터 100중 랜덤한 숫자 하나를 뽑습니다.", inline=False)    
+    playhelp.set_thumbnail(url='https://cdn.discordapp.com/attachments/955355332983521300/960057531512799242/lego.png')
 
     if 플러그인 == None:
         await ctx.respond(embed=help)
@@ -79,22 +91,34 @@ async def 도움말(ctx, 플러그인:Option(str,"다음 중 하나를 선택하
         if 플러그인 == "서버관리":
             await ctx.respond(embed=serverhelp)
             return
-        searchplug = ["검색","ㄱ검색","파싱"]
         if 플러그인 == "검색":
             await ctx.respond(embed=searchhelp)
             return
-        minecraftplug = ["마인크래프트""마크"]
         if 플러그인 == "마인크래프트":
             await ctx.respond(embed=minecrafthelp)
             return
-        if 플러그인 == "놀이":
-            await ctx.respond(embed=playthelp)
+        if 플러그인 == "자가진단":
+            await ctx.respond(embed=hcskrhelp)
             return
-
+        if 플러그인 == "놀이":
+            await ctx.respond(embed=playhelp)
+            return
 
         else:
             noplugin = discord.Embed(title=f":exclamation: 플러그인이 없습니다.", description=f"`/도움말`로 플러그인을 확인해주세요.", colour=0xffdc16)
             await ctx.respond(embed=noplugin)
+
+
+@bot.slash_command(guild_ids = [test_guild], description="봇에서 사용가능한 모든 명령어를 출력합니다.")
+async def 명령어(ctx):
+    cmdlist = discord.Embed(title=bot.user.name, color=0xffdc16)
+    cmdlist.add_field(name="서버관리", value='ㅁ', inline=False)
+    cmdlist.add_field(name='검색', value='ㅁ', inline=False)
+    cmdlist.add_field(name="전적", value="ㅁ", inline=False)
+    cmdlist.add_field(name="마인크래프트", value='ㅁ', inline=False)
+    cmdlist.add_field(name="놀이", value='ㅁ', inline=False)
+    cmdlist.set_thumbnail(url=bot.user.display_avatar)
+    await ctx.respond(embed=cmdlist)
 
 
 @bot.command(guild_ids = [test_guild], description="봇 레이턴시 확인")
@@ -119,19 +143,4 @@ async def 정보(ctx):
     botinfo.set_thumbnail(url=bot.user.display_avatar)
     await ctx.respond(embed=botinfo)
 
-
-@bot.command(aliases=['hellothisisverification'], description="개발자확인용")#한국봇리스트 인증용
-async def checkbotowner(ctx):
-    await ctx.respond(owner+"v1")
-
-
-'''
-@bot.event
-async def on_ready():
-    ch = bot.get_channel(927913185766436885)
-    await ch.purge(limit = 100)
-    v = discord.ui.View()
-    v.add_item(Vrb())
-    await ch.send(view=v)
-'''
 bot.run(token)
