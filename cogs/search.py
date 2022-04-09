@@ -1,7 +1,6 @@
 import discord
 from discord.commands import slash_command, Option
 from discord.ext import commands
-from discord.utils import get
 from bs4 import BeautifulSoup
 import requests
 import urllib

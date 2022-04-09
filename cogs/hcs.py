@@ -1,8 +1,7 @@
-from unittest import TestResult
 import discord
 from discord.commands import slash_command, Option
 from discord.ext import commands
-from hcskr import asyncSelfCheck, QuickTestResult
+from hcskr import asyncSelfCheck
 
 
 import setting
