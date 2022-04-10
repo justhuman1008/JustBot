@@ -4,14 +4,11 @@ from discord.ext import commands
 from hcskr import asyncSelfCheck
 
 
-import setting
-
-
 class hcs(commands.Cog):
     def __init__(self, bot):
         self.bot = bot 
 
-    @slash_command(guild_ids = [setting.test_guild], description="교육부 자가진단을 진행합니다.")
+    @slash_command(description="교육부 자가진단을 진행합니다.")
     async def 자가진단(self, ctx, 이름:Option(str,"본인의 이름을 작성해주세요."), 생년월일:Option(str,"6자리 생년월일을 작성해주세요. (ex 051010"),
         지역:Option(str,"학교가 속한 지역을 작성해주세요. (ex 부산)"), 학교명:Option(str,"학교의 이름을 작성해주세요. (ex 부산중학교)"),
         학교분류:Option(str,"학교종류를 작성해주세요. (ex 중학교)"), 비밀번호:Option(str,"자가진단 비밀번호를 작성해주세요.")):

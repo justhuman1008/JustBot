@@ -2,8 +2,9 @@ import discord
 from discord.commands import slash_command, Option
 from discord.ext import commands
 import requests
+from urllib.request import urlopen, Request
+import json
 
-import setting
 
 def findUUID(nickname):        
     try:
@@ -20,7 +21,7 @@ class minecraft(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @slash_command(guild_ids = [setting.test_guild], description="유저의 마인크래프트 UUID를 검색합니다.")
+    @slash_command(description="유저의 마인크래프트 UUID를 검색합니다.")
     async def uuid(self, ctx, 닉네임):
         name, uuid = findUUID(닉네임)
         if name == 'Not Found':
@@ -34,7 +35,7 @@ class minecraft(commands.Cog):
             foundUUID.set_thumbnail(url=f"https://crafatar.com/avatars/{uuid}.png?overlay")
             await ctx.respond(embed=foundUUID)
 
-    @slash_command(guild_ids = [setting.test_guild], description="유저의 마인크래프트 스킨을 검색합니다.")
+    @slash_command(description="유저의 마인크래프트 스킨을 검색합니다.")
     async def 스킨(self, ctx, 닉네임):
         name, uuid = findUUID(닉네임)
         if name == 'Not Found':
@@ -49,7 +50,7 @@ class minecraft(commands.Cog):
             await ctx.respond(embed=foundSKIN)
 
 
-    @slash_command(guild_ids = [setting.test_guild], description="마인크래프트 사양을 확인합니다.")
+    @slash_command(description="마인크래프트 사양을 확인합니다.")
     async def 마크사양(self, ctx, 사양:Option(str,"다음 중 하나를 선택하세요.", choices=["최소사양", "권장사양"])):
         userPC1 = discord.Embed(title="Minecraft: Java Edition 시스템 요구 사항", description="최소 사양", color=0xffdc16)
         userPC1.add_field(name="CPU",value="Intel Core i3-3210 / AMD A8-7600과 동급 장치",inline=False)
@@ -73,7 +74,30 @@ class minecraft(commands.Cog):
             await ctx.respond(embed=userPC2)
 
 
-    @slash_command(guild_ids = [setting.test_guild], description="마인크래프트 발전과제 목록을 확인합니다.")
+    @slash_command(description="마인크래프트 서버의 상태를 확인합니다.")
+    async def 서버상태(self, ctx, 서버주소:Option(str,"상태를 확인할 마인크래프트 서버의 주소를 입력해주세요")):
+        req = Request(f"https://api.mcsrvstat.us/2/{서버주소}")
+        webpage = urlopen(req).read()
+        API = json.loads(webpage)
+        if API['online'] == True:
+            motd = str(API['motd']['clean'])
+            motd = motd[1:-1]
+            motd = motd.replace(",","\n")
+            motd = motd.replace("'","")
+
+            server_info = discord.Embed(title=f"{API['hostname']}의 현재 서버상태", description="­", color=0xffdc16)
+            server_info.add_field(name="서버 MOTD", value=motd, inline=False)
+            server_info.add_field(name="서버 주소", value=API['hostname'], inline=True)
+            server_info.add_field(name="서버 IP", value=API['ip'], inline=True)
+            server_info.add_field(name="서버 버전", value=API['version'], inline=True)
+            server_info.add_field(name="서버 접속자", value=f"{API['players']['online']}/{API['players']['max']}", inline=False)
+            server_info.set_thumbnail(url=f"https://api.mcsrvstat.us/icon/{API['hostname']}")
+            await ctx.respond(embed=server_info)
+        else:
+            await ctx.respond(embed=discord.Embed(title=f"{서버주소}가 오프라인 상태입니다.", description="서버주소를 제대로 입력했는지 확인해보세요.", color=0xf8e71c))
+
+
+    @slash_command(description="마인크래프트 발전과제 목록을 확인합니다.")
     async def 발전과제(self, ctx, 발전과제트리:Option(str,"다음 중 하나를 선택하세요.", choices=["Minecraft", "네더(Nether)", "엔드(The End)", "모험(Adventure)", "농사(Husbandry)"])):
 
         mincrft_page1 = discord.Embed(title="Minecraft", description="­", color=0xffdc16)
@@ -214,40 +238,74 @@ class minecraft(commands.Cog):
         Farm_page2.set_footer(text="📄 2/2 페이지")
         Farm_page2.set_thumbnail(url="https://cdn.discordapp.com/attachments/731471072310067221/882524463193796638/Advancement-Farm.png")
 
-        mincrft_page = [mincrft_page1, mincrft_page2]
-        Nether_page = [Nether_page1, Nether_page2, Nether_page3]
-        Adventure_page = [Adventure_page1, Adventure_page2, Adventure_page3]
-        Farm_page = [Farm_page1, Farm_page2]
-
         if 발전과제트리 == "Minecraft":
-            ADV_Embed = mincrft_page
+            ADV_Embed = [mincrft_page1, mincrft_page2]
         if 발전과제트리 == "네더(Nether)":
-            ADV_Embed = Nether_page
+            ADV_Embed = [Nether_page1, Nether_page2, Nether_page3]
         if 발전과제트리 == "엔드(The End)":
             return await ctx.respond(embed=Ender_page)
         if 발전과제트리 == "모험(Adventure)":
-            ADV_Embed = Adventure_page
+            ADV_Embed = [Adventure_page1, Adventure_page2, Adventure_page3]
         if 발전과제트리 == "농사(Husbandry)":
-            ADV_Embed = Farm_page
+            ADV_Embed = [Farm_page1, Farm_page2]
+        pageNum = int(len(ADV_Embed))
 
         class Button(discord.ui.View):
-            @discord.ui.button(style=discord.ButtonStyle.secondary, emoji="1️⃣")
+            @discord.ui.button(style=discord.ButtonStyle.primary, emoji="1️⃣", custom_id="page1",disabled=True)
             async def page1(self, button: discord.ui.Button, interaction: discord.Interaction):
-                await mainembed.edit_original_message(embed=ADV_Embed[0])
+                button.disabled = True
+                button.style = discord.ButtonStyle.primary
 
-            @discord.ui.button(style=discord.ButtonStyle.secondary, emoji="2️⃣")
+                pg1_button2 = [b for b in self.children if b.custom_id=="page2"][0]
+                pg1_button2.disabled = False
+                pg1_button2.style = discord.ButtonStyle.secondary
+
+                if pageNum == 3:
+                    pg1_button3 = [c for c in self.children if c.custom_id=="page3"][0]
+                    pg1_button3.disabled = False
+                    pg1_button3.style = discord.ButtonStyle.secondary
+
+                await interaction.response.edit_message(view=self)
+                await mainembed.edit_original_message(embed=ADV_Embed[0])
+                
+            @discord.ui.button(style=discord.ButtonStyle.secondary, emoji="2️⃣", custom_id="page2")
             async def page2(self, button: discord.ui.Button, interaction: discord.Interaction):
+                button.disabled = True
+                button.style = discord.ButtonStyle.primary
+
+                pg2_button1 = [a for a in self.children if a.custom_id=="page1"][0]
+                pg2_button1.disabled = False
+                pg2_button1.style = discord.ButtonStyle.secondary
+
+                if pageNum == 3:
+                    pg2_button3 = [c for c in self.children if c.custom_id=="page3"][0]
+                    pg2_button3.disabled = False
+                    pg2_button3.style = discord.ButtonStyle.secondary
+
+                await interaction.response.edit_message(view=self)
                 await mainembed.edit_original_message(embed=ADV_Embed[1])
 
-            @discord.ui.button(style=discord.ButtonStyle.secondary, emoji="3️⃣")
-            async def page3(self, button: discord.ui.Button, interaction: discord.Interaction):
-                try:
-                    await mainembed.edit_original_message(embed=ADV_Embed[2])
-                except:
-                    msg = await ctx.send("해당 발전과제는 3페이지가 없습니다.")
-                    await msg.delete(delay=2)
+            if pageNum == 3:
+                @discord.ui.button(style=discord.ButtonStyle.secondary, emoji="3️⃣", custom_id="page3")
+                async def page3(self, button: discord.ui.Button, interaction: discord.Interaction):
+                    button.disabled = True
+                    button.style = discord.ButtonStyle.primary
 
-        mainembed = await ctx.respond(embed=ADV_Embed[0], view=Button())
+                    pg3_button1 = [a for a in self.children if a.custom_id=="page1"][0]
+                    pg3_button1.disabled = False
+                    pg3_button1.style = discord.ButtonStyle.secondary
+
+                    pg3_button2 = [b for b in self.children if b.custom_id=="page2"][0]
+                    pg3_button2.disabled = False
+                    pg3_button2.style = discord.ButtonStyle.secondary
+
+                    await interaction.response.edit_message(view=self)
+                    await mainembed.edit_original_message(embed=ADV_Embed[2])
+
+            async def on_timeout(self):
+                await mainembed.edit_original_message(view=None)
+
+        mainembed = await ctx.respond(embed=ADV_Embed[0], view=Button(timeout=120))
 
 def setup(bot):
     bot.add_cog(minecraft(bot))

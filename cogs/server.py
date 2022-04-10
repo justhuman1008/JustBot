@@ -3,13 +3,12 @@ from discord.commands import slash_command, Option
 from discord.ext import commands
 from asyncio import sleep
 
-import setting
 
 class server(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @slash_command(guild_ids = [setting.test_guild], description="이 서버에 대한 정보를 불러옵니다.")
+    @slash_command(description="이 서버에 대한 정보를 불러옵니다.")
     async def 서버정보(self, ctx):
         current_guild: discord.Guild = ctx.guild
 
@@ -45,7 +44,7 @@ class server(commands.Cog):
         await ctx.respond(embed=guild_info)
 
 
-    @slash_command(guild_ids = [setting.test_guild], description="내 디스코드 정보를 불러옵니다.")
+    @slash_command(description="내 디스코드 정보를 불러옵니다.")
     async def 내정보(self, ctx):
         user_info = discord.Embed(title=f"{ctx.author.name}#{ctx.author.discriminator}", colour=0xffdc16)
         user_info.add_field(name="별명", value="`"+ctx.author.display_name+"`", inline=True)
@@ -57,7 +56,7 @@ class server(commands.Cog):
         await ctx.respond(embed=user_info)
 
         
-    @slash_command(guild_ids = [setting.test_guild], description="채널의 메시지를 대량으로 삭제합니다.")
+    @slash_command(description="채널의 메시지를 대량으로 삭제합니다.")
     @commands.has_permissions(manage_messages=True)
     async def 청소(self, ctx, 삭제수량:Option(int,"삭제할 메시지의 수량을 입력해주세요")):
         if 삭제수량 <= 0:
@@ -69,8 +68,8 @@ class server(commands.Cog):
         await deletenotice.delete_original_message(delay=1)
 
 
-    @slash_command(guild_ids = [setting.test_guild], description="멘션한 유저를 추방합니다.")
-    @commands.has_permissions(ban_members=True)
+    @slash_command(description="멘션한 유저를 추방합니다.")
+    @commands.has_permissions(kick_members=True)
     async def 추방(self, ctx, 추방할유저:Option(discord.User,"추방할 유저를 멘션해주세요"), 사유:Option(str,"추방하는 사유를 작성해주세요")=None):
         member = 추방할유저
         reason = 사유
@@ -89,7 +88,7 @@ class server(commands.Cog):
             await ctx.respond(embed=kick)
 
 
-    @slash_command(guild_ids = [setting.test_guild], description="멘션한 유저를 차단합니다.")
+    @slash_command(description="멘션한 유저를 차단합니다.")
     @commands.has_permissions(ban_members=True)
     async def 차단(self, ctx, 차단할유저:Option(discord.User,"차단할 유저를 멘션해주세요"), 사유:Option(str,"차단하는 사유를 작성해주세요")=None):
         member = 차단할유저
@@ -109,7 +108,7 @@ class server(commands.Cog):
             await ctx.respond(embed=ban)
 
 
-    @slash_command(guild_ids = [setting.test_guild], description="이 서버의 초대링크를 생성합니다.")
+    @slash_command(description="이 서버의 초대링크를 생성합니다.")
     @commands.has_permissions(create_instant_invite=True)
     async def 초대링크(self, ctx, 사용가능횟수:Option(int,"생성할 초대링크의 최대 사용 횟수를 입력해주세요")=10):
         uses = 사용가능횟수
@@ -117,7 +116,7 @@ class server(commands.Cog):
         await ctx.respond(f'> **{ctx.guild}** 서버의 초대링크를 생성하였습니다(`{uses}회 제한`)\n> {invitelink}')
 
 
-    @slash_command(guild_ids = [setting.test_guild], description="서버에 새로운 역할을 생성합니다.")
+    @slash_command(description="서버에 새로운 역할을 생성합니다.")
     @commands.has_permissions(manage_roles=True)
     async def 역할생성(self, ctx, 역할명:Option(str,"생성할 역할의 이름을 입력해주세요")):
         role = 역할명
@@ -125,7 +124,7 @@ class server(commands.Cog):
         await ctx.respond(embed=discord.Embed(title=f"역할 `{role}`이(가) 생성되었습니다.", color=0xf8e71c))
 
 
-    @slash_command(guild_ids = [setting.test_guild], description="서버에 새로운 텍스트 채널을 생성합니다.")
+    @slash_command(description="서버에 새로운 텍스트 채널을 생성합니다.")
     @commands.has_permissions(manage_channels=True)
     async def 채널생성(self, ctx, 채널명:Option(str,"생성할 채널의 이름을 입력해주세요")):
         channel = 채널명
@@ -135,7 +134,7 @@ class server(commands.Cog):
         return
 
 
-    @slash_command(guild_ids = [setting.test_guild], description="서버에 새로운 음성 채널을 생성합니다.")
+    @slash_command(description="서버에 새로운 음성 채널을 생성합니다.")
     @commands.has_permissions(manage_channels=True)
     async def 통화방생성(self, ctx, 채널명:Option(str,"생성할 음성 채널의 이름을 입력해주세요")):
         channel = 채널명
@@ -145,7 +144,7 @@ class server(commands.Cog):
         return
 
 
-    @slash_command(guild_ids = [setting.test_guild], description="서버에 새로운 카테고리를 생성합니다.")
+    @slash_command(description="서버에 새로운 카테고리를 생성합니다.")
     @commands.has_permissions(manage_channels=True)
     async def 카테고리생성(self, ctx, 카테고리명:Option(str,"생성할 카테고리의 이름을 입력해주세요")):
         name = 카테고리명
@@ -155,7 +154,7 @@ class server(commands.Cog):
         return
 
 
-    @slash_command(guild_ids = [setting.test_guild], description="채널에 슬로우모드를 겁니다.")
+    @slash_command(description="채널에 슬로우모드를 겁니다.")
     @commands.has_permissions(manage_channels=True)
     async def 슬로우모드(self, ctx, 초:Option(int,"이 채널에서 메시지를 보낼 수 있는 간격을 입력해주세요(초 단위)")=3):
         num = 초

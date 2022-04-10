@@ -1,10 +1,10 @@
 import discord
 from discord.commands import Option
-from discord.ext import tasks
+from discord.ui import View
 from os import listdir
 from sys import exit
 
-from setting import token, owner, test_guild
+from setting import token, owner
 
 bot = discord.Bot()
 
@@ -33,7 +33,7 @@ for filename in listdir('./cogs'): # Cogs 자동 로드(봇 작동시)
 
 
 
-@bot.slash_command(guild_ids = [test_guild], description="봇 도움말 확인")
+@bot.slash_command(description="봇 도움말 확인")
 async def 도움말(ctx, 플러그인:Option(str,"다음 중 하나를 선택하세요.", choices=["서버관리", "검색", "놀이", "마인크래프트", "자가진단"])=None):
 
     help = discord.Embed(title=f"{bot.user.name} 도움말", description=f"­", colour=0xffdc16)
@@ -80,6 +80,7 @@ async def 도움말(ctx, 플러그인:Option(str,"다음 중 하나를 선택하
     minecrafthelp = discord.Embed(title=f"마인크래프트 도움말", description=f"Java Edition 1.18.2 기준", colour=0xffdc16)
     minecrafthelp.add_field(name=f"/uuid `<닉네임>`", value=f":small_blue_diamond:"+"유저의 마인크래프트 UUID를 검색합니다.", inline=False)
     minecrafthelp.add_field(name=f"/스킨 `<닉네임>`", value=f":small_blue_diamond:"+"유저의 마인크래프트 스킨을 검색합니다.", inline=False)
+    minecrafthelp.add_field(name=f"/서버상태 `<서버주소>`", value=f":small_blue_diamond:"+"마인크래프트 서버의 상태를 확인합니다.", inline=False)
     minecrafthelp.add_field(name=f"/발전과제 `<발전과제트리>`", value=f":small_blue_diamond:"+"마인크래프트 발전과제 목록을 확인합니다.", inline=False)
     minecrafthelp.add_field(name=f"/마크사양 `<권장,최소>`", value=f":small_blue_diamond:"+"마인크래프트 사양을 확인합니다.", inline=False)
     minecrafthelp.set_thumbnail(url='https://cdn.discordapp.com/attachments/955355332983521300/960085353404964884/minecraft.png')
@@ -87,6 +88,13 @@ async def 도움말(ctx, 플러그인:Option(str,"다음 중 하나를 선택하
     hcskrhelp = discord.Embed(title=f"자가진단 도움말", description=f"­", colour=0xffdc16)   
     hcskrhelp.add_field(name=f"/자가진단 `<이름>` `<생년월일>` `<지역>` `<학교명>` `<학교분류>` `<비밀번호>`", value=f":small_blue_diamond:"+"교육부 자가진단을 진행합니다.", inline=False)
     hcskrhelp.set_thumbnail(url='https://cdn.discordapp.com/attachments/955355332983521300/961565520451235840/hcskr.png')
+
+    bothelp = discord.Embed(title=f"봇 도움말", description=f"­", colour=0xffdc16)   
+    bothelp.add_field(name=f"/ping", value=f":small_blue_diamond:"+"봇 레이턴시 확인", inline=False)
+    bothelp.add_field(name=f"/정보", value=f":small_blue_diamond:"+"봇에 대한 정보를 출력합니다.", inline=False)
+    bothelp.add_field(name=f"/도움말", value=f":small_blue_diamond:"+"봇 도움말 확인", inline=False)
+    bothelp.add_field(name=f"/명령어", value=f":small_blue_diamond:"+"봇에서 사용가능한 모든 명령어를 출력합니다.", inline=False)
+    bothelp.set_thumbnail(url='https://cdn.discordapp.com/attachments/955355332983521300/961565520451235840/hcskr.png')
 
     if 플러그인 == None:
         await ctx.respond(embed=help)
@@ -113,25 +121,25 @@ async def 도움말(ctx, 플러그인:Option(str,"다음 중 하나를 선택하
             await ctx.respond(embed=noplugin)
 
 
-@bot.slash_command(guild_ids = [test_guild], description="봇에서 사용가능한 모든 명령어를 출력합니다.")
+@bot.slash_command(description="봇에서 사용가능한 모든 명령어를 출력합니다.")
 async def 명령어(ctx):
     cmdlist = discord.Embed(title=bot.user.name, color=0xffdc16)
     cmdlist.add_field(name="서버관리", value='`/서버정보` `/내정보` `/청소` `/추방` `/차단` `/초대링크` `/역할생성` `/채널생성` `/통화방생성` `/카테고리생성` `/슬로우모드`', inline=False)
     cmdlist.add_field(name='검색', value='`/구글` `/네이버` `/번역` `/코로나` `/날씨` `/단축링크` `/위키실검` `/멜론차트` `/한강수온`', inline=False)
     cmdlist.add_field(name="놀이", value='`/따라하기` `/주사위` `/숫자` `/소수`', inline=False)
-    cmdlist.add_field(name="마인크래프트", value='`/uuid` `/스킨` `/발전과제` `/마크사양`', inline=False)
+    cmdlist.add_field(name="마인크래프트", value='`/uuid` `/스킨` `/서버상태` `/발전과제` `/마크사양`', inline=False)
     cmdlist.add_field(name="자가진단", value="`/자가진단`", inline=False)
     cmdlist.set_thumbnail(url=bot.user.display_avatar)
     await ctx.respond(embed=cmdlist)
 
 
-@bot.command(guild_ids = [test_guild], description="봇 레이턴시 확인")
+@bot.command(description="봇 레이턴시 확인")
 async def ping(ctx):
     ping = discord.Embed(title="Pong!", description=f"딜레이: {round(bot.latency * 1000)}ms 초", colour=0xffdc16)
     await ctx.respond(embed=ping)
 
 
-@bot.command(guild_ids = [test_guild], description=f"봇에 대한 정보를 출력합니다.")
+@bot.command(description=f"봇에 대한 정보를 출력합니다.")
 async def 정보(ctx):
     botinfo = discord.Embed(title=bot.user.name, color=0xffdc16)
     botinfo.add_field(name="핑", value=f'`{round(bot.latency * 1000)}ms`', inline=True)
@@ -146,5 +154,18 @@ async def 정보(ctx):
     botinfo.add_field(name="소유자", value=f"{owner}", inline=False)
     botinfo.set_thumbnail(url=bot.user.display_avatar)
     await ctx.respond(embed=botinfo)
+
+@bot.command(description=f"봇 초대링크")
+async def invite(ctx):
+    invitelink = f"https://discord.com/oauth2/authorize?client_id={bot.application_id}&permissions=137715076183&scope=bot%20applications.commands"
+
+    invite = discord.Embed(title=f"{bot.user.name} 초대하기", description=f"[봇 초대하기]({invitelink})", colour=0xffdc16)
+    invite.set_thumbnail(url=bot.user.display_avatar)
+
+    button = discord.ui.Button(label="봇 초대하기", url=invitelink, emoji="✉️")
+    view = View()
+    view.add_item(button)
+
+    await ctx.respond(embed=invite,view=view)
 
 bot.run(token)

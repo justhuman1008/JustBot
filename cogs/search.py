@@ -57,7 +57,7 @@ class search(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @slash_command(guild_ids = [setting.test_guild], description="구글에 검색합니다.")
+    @slash_command(description="구글에 검색합니다.")
     async def 구글(self, ctx, 검색내용:Option(str,"구글에 검색할 내용을 입력해주세요")):
         url = 'https://www.google.com/search?q='+검색내용
 
@@ -66,7 +66,7 @@ class search(commands.Cog):
         await ctx.respond(embed=google)
 
 
-    @slash_command(guild_ids = [setting.test_guild], description="네이버에 검색합니다.")
+    @slash_command(description="네이버에 검색합니다.")
     async def 네이버(self, ctx, 검색내용:Option(str,"네이버에 검색할 내용을 입력해주세요")):
         url = 'https://search.naver.com/search.naver?query='+검색내용
 
@@ -75,7 +75,7 @@ class search(commands.Cog):
         await ctx.respond(embed=naver)
 
 
-    @slash_command(guild_ids = [setting.test_guild], description="메세지를 번역합니다. [5000자 제한]")
+    @slash_command(description="메세지를 번역합니다. [5000자 제한]")
     async def 번역(self, ctx, 번역할내용:Option(str,"번역할 내용을 입력해주세요 [5000자 제한]")):
         class selector(discord.ui.View):
             @discord.ui.select(placeholder="번역될 언어를 선택하세요",min_values=1,max_values=1,options=[
@@ -113,10 +113,13 @@ class search(commands.Cog):
                 papago.set_thumbnail(url='https://cdn.discordapp.com/attachments/955355332983521300/958683584284229672/papagonobg.png')
                 await dropdown.edit_original_message(embed=papago,content=None)
 
-        dropdown = await ctx.respond("입력한 내용이 번역될 언어를 선택하세요.", view=selector())
+            async def on_timeout(self):
+                await dropdown.delete_original_message()
+
+        dropdown = await ctx.respond("입력한 내용이 번역될 언어를 선택하세요.", view=selector(timeout=5))
 
 
-    @slash_command(guild_ids = [setting.test_guild], description="대한민국의 코로나19 현황을 불러옵니다.")
+    @slash_command(description="대한민국의 코로나19 현황을 불러옵니다.")
     async def 코로나(self, ctx):
         servicekey = setting.covid19APIkey
         if servicekey == "":
@@ -152,7 +155,7 @@ class search(commands.Cog):
         await ctx.respond(embed=covid19)
 
 
-    @slash_command(guild_ids = [setting.test_guild], description="해당 지역의 날씨를 불러옵니다.")
+    @slash_command(description="해당 지역의 날씨를 불러옵니다.")
     async def 날씨(self, ctx, 지역명:Option(str,"날씨를 검색할 지역을 입력해주세요")):
         try:
             enc_location = urllib.parse.quote(지역명+'날씨')
@@ -212,7 +215,7 @@ class search(commands.Cog):
             await ctx.respond(embed=weathererror)
 
 
-    @slash_command(guild_ids = [setting.test_guild], description="입력한 링크를 단축합니다.")
+    @slash_command(description="입력한 링크를 단축합니다.")
     async def 단축링크(self, ctx, 링크:Option(str,"단축할 링크를 입력해주세요.")):
         client_id = setting.NaverAPIID
         client_secret = setting.NaverAPIPW
@@ -231,7 +234,7 @@ class search(commands.Cog):
             return
 
 
-    @slash_command(guild_ids = [setting.test_guild], description="나무위키의 실시간 검색어를 불러옵니다.")
+    @slash_command(description="나무위키의 실시간 검색어를 불러옵니다.")
     async def 위키실검(self, ctx):
         hdr = {"User-Agent": "Mozilla/5.0"}
         url = "https://search.namu.wiki/api/ranking"
@@ -255,7 +258,7 @@ class search(commands.Cog):
             await ctx.respond(embed=wikirank)
 
 
-    @slash_command(guild_ids = [setting.test_guild], description="멜론 차트 TOP10을 불러옵니다.")
+    @slash_command(description="멜론 차트 TOP10을 불러옵니다.")
     async def 멜론차트(self, ctx):
         melon = discord.Embed(title="멜론 음악차트", description="[멜론차트 바로가기](https://www.melon.com/chart/index.htm)", color=0xffdc16)
         melon.set_thumbnail(url='https://cdn.discordapp.com/attachments/955355332983521300/955382742550466600/1.png')
@@ -274,7 +277,7 @@ class search(commands.Cog):
         await ctx.respond(embed=melon)
 
 
-    @slash_command(guild_ids = [setting.test_guild], description="한강의 실시간 수온을 불러옵니다.")
+    @slash_command(description="한강의 실시간 수온을 불러옵니다.")
     async def 한강수온(self, ctx):
         req = Request("http://hangang.dkserver.wo.tc/")
         webpage = urlopen(req).read()
@@ -294,7 +297,7 @@ class search(commands.Cog):
 #=======================================================================================================================================================
 
 
-    @discord.message_command(guild_ids = [setting.test_guild], name="한국어로 번역하기")
+    @discord.message_command(name="한국어로 번역하기")
     async def trans1(self, ctx, message:discord.message):
         if message.content == "":
             onlytext = await ctx.respond("문자 형식으로 된 내용만 번역할 수 있습니다.")
@@ -317,7 +320,7 @@ class search(commands.Cog):
         await ctx.respond(embed=papago)
 
 
-    @discord.message_command(guild_ids = [setting.test_guild], name="영어로 번역하기")
+    @discord.message_command(name="영어로 번역하기")
     async def trans2(self, ctx, message:discord.message):
         if message.content == "":
             onlytext = await ctx.respond("문자 형식으로 된 내용만 번역할 수 있습니다.")
@@ -340,7 +343,7 @@ class search(commands.Cog):
         await ctx.respond(embed=papago)
 
 
-    @discord.message_command(guild_ids = [setting.test_guild], name="일본어로 번역하기")
+    @discord.message_command(name="일본어로 번역하기")
     async def trans3(self, ctx, message:discord.message):
         if message.content == "":
             onlytext = await ctx.respond("문자 형식으로 된 내용만 번역할 수 있습니다.")
@@ -363,7 +366,7 @@ class search(commands.Cog):
         await ctx.respond(embed=papago)
 
 
-    @discord.message_command(guild_ids = [setting.test_guild], name="중국어(간체)로 번역하기")
+    @discord.message_command(name="중국어(간체)로 번역하기")
     async def trans4(self, ctx, message:discord.message):
         if message.content == "":
             onlytext = await ctx.respond("문자 형식으로 된 내용만 번역할 수 있습니다.")
