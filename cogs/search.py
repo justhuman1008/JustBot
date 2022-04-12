@@ -116,7 +116,7 @@ class search(commands.Cog):
             async def on_timeout(self):
                 await dropdown.delete_original_message()
 
-        dropdown = await ctx.respond("입력한 내용이 번역될 언어를 선택하세요.", view=selector(timeout=5))
+        dropdown = await ctx.respond("입력한 내용이 번역될 언어를 선택하세요.", view=selector())
 
 
     @slash_command(description="대한민국의 코로나19 현황을 불러옵니다.")
