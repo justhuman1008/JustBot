@@ -182,7 +182,7 @@ class search(commands.Cog):
             vapor = weatherbox.select('dd', {'class': 'desc'})[1].get_text() # 습도
             wind = weatherbox.select('dd', {'class': 'desc'})[2].get_text() # 바람
 
-            Sunlight = weatherbox.find('li', {'class': 'item_today level3'}).get_text()# 자외선지수
+            Sunlight = weatherbox.find('li', {'class': 'item_today level1'}).get_text()# 자외선지수
             Sunlight = Sunlight.replace("  자외선 ","")
 
             dust1 = weatherbox.select('span', {'class': 'txt'})[13].get_text()# 미세먼지
@@ -198,7 +198,7 @@ class search(commands.Cog):
             weather.add_field(name='자외선', value=Sunlight, inline=True)
             weather.add_field(name='미세먼지', value=f"미세먼지: {dust1}/ 초미세먼지: {dust2}", inline=False)
             weather.set_thumbnail(url='https://cdn.discordapp.com/attachments/955355332983521300/960457909043605504/weather.png')
-            
+                
             if Cast.find("맑음") > -1:
                 weather.set_thumbnail(url=f'https://cdn.discordapp.com/attachments/955355332983521300/960457926240260097/01.png')
             elif Cast.find("흐림") > -1:
