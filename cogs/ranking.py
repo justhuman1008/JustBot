@@ -10,7 +10,7 @@ class ranking(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @slash_command(guild_ids = [setting.test_guild], description="유저의 롤 티어를 불러옵니다.")
+    @slash_command(description="유저의 롤 티어를 불러옵니다.")
     async def 롤티어(self, ctx, 닉네임:Option(str,"롤 티어를 검색할 유저의 닉네임을 입력해주세요")):
         riotkey = setting.RiotAPIKey
 
