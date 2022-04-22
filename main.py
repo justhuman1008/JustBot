@@ -34,7 +34,7 @@ for filename in listdir('./cogs'): # Cogs 자동 로드(봇 작동시)
 
 
 @bot.slash_command(description="봇 도움말 확인")
-async def 도움말(ctx, 플러그인:Option(str,"다음 중 하나를 선택하세요.", choices=["서버관리", "검색", "놀이", "마인크래프트", "자가진단"])=None):
+async def 도움말(ctx, 플러그인:Option(str,"다음 중 하나를 선택하세요.", choices=["서버관리", "검색", "놀이", "마인크래프트", "자가진단", "봇"])=None):
 
     help = discord.Embed(title=f"{bot.user.name} 도움말", description=f"­", colour=0xffdc16)
     help.add_field(name=f"서버관리", value=f"`/도움말 서버관리`", inline=True)
@@ -42,6 +42,7 @@ async def 도움말(ctx, 플러그인:Option(str,"다음 중 하나를 선택하
     help.add_field(name=f"놀이", value=f"`/도움말 놀이`", inline=True)
     help.add_field(name=f"마인크래프트", value=f"`/도움말 마인크래프트`", inline=True)
     help.add_field(name=f"자가진단", value=f"`/도움말 자가진단`", inline=True)
+    help.add_field(name=f"봇", value=f"`/도움말 봇`", inline=True)
     help.set_thumbnail(url=bot.user.display_avatar)
 
     serverhelp = discord.Embed(title=f"서버관리 도움말", description=f"­", colour=0xffdc16)
@@ -68,6 +69,7 @@ async def 도움말(ctx, 플러그인:Option(str,"다음 중 하나를 선택하
     searchhelp.add_field(name=f"/위키실검", value=f":small_blue_diamond:"+"나무위키의 실시간 검색어를 불러옵니다.", inline=False)
     searchhelp.add_field(name=f"/멜론차트", value=f":small_blue_diamond:"+"멜론 차트 TOP10을 불러옵니다.", inline=False)
     searchhelp.add_field(name=f"/한강수온", value=f":small_blue_diamond:"+"한강의 실시간 수온을 불러옵니다.", inline=False)
+    searchhelp.add_field(name=f"/롤티어 `<닉네임>`", value=f":small_blue_diamond:"+"유저의 리그오브레전드 티어를 불러옵니다.", inline=False)
     searchhelp.set_thumbnail(url='https://cdn.discordapp.com/attachments/955355332983521300/959761638217629696/pngegg.png')
 
     playhelp = discord.Embed(title=f"놀이 도움말", description=f"­", colour=0xffdc16)
@@ -86,7 +88,11 @@ async def 도움말(ctx, 플러그인:Option(str,"다음 중 하나를 선택하
     minecrafthelp.set_thumbnail(url='https://cdn.discordapp.com/attachments/955355332983521300/960085353404964884/minecraft.png')
 
     hcskrhelp = discord.Embed(title=f"자가진단 도움말", description=f"­", colour=0xffdc16)   
-    hcskrhelp.add_field(name=f"/자가진단 `<이름>` `<생년월일>` `<지역>` `<학교명>` `<학교분류>` `<비밀번호>`", value=f":small_blue_diamond:"+"교육부 자가진단을 진행합니다.", inline=False)
+    hcskrhelp.add_field(name=f"/자가진단 실행", value=f":small_blue_diamond:"+"교육부 자가진단을 진행합니다.(정보 등록 필요)", inline=False)
+    hcskrhelp.add_field(name=f"/자가진단 예약", value=f":small_blue_diamond:"+"매일 오전 6시 자가진단을 진행합니다.", inline=False)
+    hcskrhelp.add_field(name=f"/자가진단 자동", value=f":small_blue_diamond:"+"매일 아침 6시에 자가진단을 진행합니다.(정보 등록 필요)", inline=False)
+    hcskrhelp.add_field(name=f"/자가진단 등록", value=f":small_blue_diamond:"+"자가진단용 정보를 봇에 입력합니다.", inline=False)
+    hcskrhelp.add_field(name=f"/자가진단 삭제", value=f":small_blue_diamond:"+"자가진단용 정보를 삭제합니다.", inline=False)
     hcskrhelp.set_thumbnail(url='https://cdn.discordapp.com/attachments/955355332983521300/961565520451235840/hcskr.png')
 
     bothelp = discord.Embed(title=f"봇 도움말", description=f"­", colour=0xffdc16)   
@@ -94,7 +100,7 @@ async def 도움말(ctx, 플러그인:Option(str,"다음 중 하나를 선택하
     bothelp.add_field(name=f"/정보", value=f":small_blue_diamond:"+"봇에 대한 정보를 출력합니다.", inline=False)
     bothelp.add_field(name=f"/도움말", value=f":small_blue_diamond:"+"봇 도움말 확인", inline=False)
     bothelp.add_field(name=f"/명령어", value=f":small_blue_diamond:"+"봇에서 사용가능한 모든 명령어를 출력합니다.", inline=False)
-    bothelp.set_thumbnail(url='https://cdn.discordapp.com/attachments/955355332983521300/961565520451235840/hcskr.png')
+    bothelp.set_thumbnail(url=bot.user.display_avatar)
 
     if 플러그인 == None:
         await ctx.respond(embed=help)
@@ -106,14 +112,17 @@ async def 도움말(ctx, 플러그인:Option(str,"다음 중 하나를 선택하
         if 플러그인 == "검색":
             await ctx.respond(embed=searchhelp)
             return
+        if 플러그인 == "놀이":
+            await ctx.respond(embed=playhelp)
+            return
         if 플러그인 == "마인크래프트":
             await ctx.respond(embed=minecrafthelp)
             return
         if 플러그인 == "자가진단":
             await ctx.respond(embed=hcskrhelp)
             return
-        if 플러그인 == "놀이":
-            await ctx.respond(embed=playhelp)
+        if 플러그인 == "봇":
+            await ctx.respond(embed=bothelp)
             return
 
         else:
@@ -125,7 +134,7 @@ async def 도움말(ctx, 플러그인:Option(str,"다음 중 하나를 선택하
 async def 명령어(ctx):
     cmdlist = discord.Embed(title=bot.user.name, color=0xffdc16)
     cmdlist.add_field(name="서버관리", value='`/서버정보` `/내정보` `/청소` `/추방` `/차단` `/초대링크` `/역할생성` `/채널생성` `/통화방생성` `/카테고리생성` `/슬로우모드`', inline=False)
-    cmdlist.add_field(name='검색', value='`/구글` `/네이버` `/번역` `/코로나` `/날씨` `/단축링크` `/위키실검` `/멜론차트` `/한강수온`', inline=False)
+    cmdlist.add_field(name='검색', value='`/구글` `/네이버` `/번역` `/코로나` `/날씨` `/단축링크` `/위키실검` `/멜론차트` `/한강수온` `/롤티어`', inline=False)
     cmdlist.add_field(name="놀이", value='`/따라하기` `/주사위` `/숫자` `/소수`', inline=False)
     cmdlist.add_field(name="마인크래프트", value='`/uuid` `/스킨` `/서버상태` `/발전과제` `/마크사양`', inline=False)
     cmdlist.add_field(name="자가진단", value="`/자가진단`", inline=False)
