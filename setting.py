@@ -2,7 +2,7 @@ import os
 
 # 봇 기본정보
 token = os.environ['Token'] # 봇의 토큰
-guild = os.environ['Guild'] # 테스트용(관리자 전용) 길드
+guild = int(os.environ['Guild']) # 테스트용(관리자 전용) 길드
 owner = os.environ['Owner'] # 봇 소유자
 
 # 공공데이터 API
