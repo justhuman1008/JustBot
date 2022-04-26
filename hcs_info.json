@@ -8,7 +8,8 @@
 			"Area": "한국",
 			"School": "한국고등학교",
 			"School_lv": "고등학교",
-			"Password": "0000"
+			"Password": "0000",
+			"Auto_check": "O"
 		}
 	]
 }

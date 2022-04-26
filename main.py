@@ -4,7 +4,7 @@ from discord.ui import View
 from os import listdir
 from sys import exit
 
-from setting import token, owner
+from setting import token, owner, guild
 
 bot = discord.Bot()
 
@@ -73,6 +73,7 @@ async def 도움말(ctx, 플러그인:Option(str,"다음 중 하나를 선택하
     searchhelp.set_thumbnail(url='https://cdn.discordapp.com/attachments/955355332983521300/959761638217629696/pngegg.png')
 
     playhelp = discord.Embed(title=f"놀이 도움말", description=f"­", colour=0xffdc16)
+    playhelp.add_field(name=f"/계산기", value=f":small_blue_diamond:"+"버튼식 계산기를 시작합니다.", inline=False)
     playhelp.add_field(name=f"/따라하기 `<따라할말>`", value=f":small_blue_diamond:"+"유저가 한 말을 따라합니다.", inline=False)
     playhelp.add_field(name=f"/주사위", value=f":small_blue_diamond:"+"주사위를 하나 던집니다.", inline=False)    
     playhelp.add_field(name=f"/숫자", value=f":small_blue_diamond:"+"1부터 100중 랜덤한 숫자 하나를 뽑습니다.", inline=False)
@@ -98,6 +99,7 @@ async def 도움말(ctx, 플러그인:Option(str,"다음 중 하나를 선택하
     bothelp = discord.Embed(title=f"봇 도움말", description=f"­", colour=0xffdc16)   
     bothelp.add_field(name=f"/ping", value=f":small_blue_diamond:"+"봇 레이턴시 확인", inline=False)
     bothelp.add_field(name=f"/정보", value=f":small_blue_diamond:"+"봇에 대한 정보를 출력합니다.", inline=False)
+    bothelp.add_field(name=f"/invite", value=f":small_blue_diamond:"+"봇 초대링크", inline=False)
     bothelp.add_field(name=f"/도움말", value=f":small_blue_diamond:"+"봇 도움말 확인", inline=False)
     bothelp.add_field(name=f"/명령어", value=f":small_blue_diamond:"+"봇에서 사용가능한 모든 명령어를 출력합니다.", inline=False)
     bothelp.set_thumbnail(url=bot.user.display_avatar)
@@ -135,9 +137,10 @@ async def 명령어(ctx):
     cmdlist = discord.Embed(title=bot.user.name, color=0xffdc16)
     cmdlist.add_field(name="서버관리", value='`/서버정보` `/내정보` `/청소` `/추방` `/차단` `/초대링크` `/역할생성` `/채널생성` `/통화방생성` `/카테고리생성` `/슬로우모드`', inline=False)
     cmdlist.add_field(name='검색', value='`/구글` `/네이버` `/번역` `/코로나` `/날씨` `/단축링크` `/위키실검` `/멜론차트` `/한강수온` `/롤티어`', inline=False)
-    cmdlist.add_field(name="놀이", value='`/따라하기` `/주사위` `/숫자` `/소수`', inline=False)
+    cmdlist.add_field(name="놀이", value='`/계산기` `/따라하기` `/주사위` `/숫자` `/소수`', inline=False)
     cmdlist.add_field(name="마인크래프트", value='`/uuid` `/스킨` `/서버상태` `/발전과제` `/마크사양`', inline=False)
     cmdlist.add_field(name="자가진단", value="`/자가진단`", inline=False)
+    cmdlist.add_field(name="봇", value="`/ping` `정보` `/invite` `/도움말` `/명령어`", inline=False)
     cmdlist.set_thumbnail(url=bot.user.display_avatar)
     await ctx.respond(embed=cmdlist)
 
@@ -176,5 +179,9 @@ async def invite(ctx):
     view.add_item(button)
 
     await ctx.respond(embed=invite,view=view)
+
+@bot.slash_command(guild_ids=[guild], description="봇에서 유저 DB를 다운받습니다.")
+async def db다운(ctx):
+    await ctx.respond(file=discord.File('hcs_info.json'))
 
 bot.run(token)

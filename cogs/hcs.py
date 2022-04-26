@@ -4,8 +4,8 @@ from discord.ui import InputText, Modal
 from discord.ext import commands
 from hcskr import asyncSelfCheck
 import json
-
-file_path = "hcs_info.json"
+from setting import hcs_path
+file_path = hcs_path
 
 def is_register(DiscordID):
     with open(file_path, "r", encoding="utf_8") as json_file:

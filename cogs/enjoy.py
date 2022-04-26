@@ -11,6 +11,183 @@ class enjoy(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    @slash_command(description="버튼식 계산기를 시작합니다.")
+    async def 계산기(self, ctx):
+        BotName = self.bot.user.name
+        CalcEMV = discord.Embed(title=f"{BotName} 계산기", description=f'```\n0' + ' '*30 + '\n```', color=0xffdc16)
+        CalcEMV.set_thumbnail(url='https://cdn.discordapp.com/attachments/955355332983521300/962232633234948126/mathmu.png')
+
+        def symbols_Button(btn_self):
+            marker = ["+","-","*","/"]
+            last = str(btn_self.values[len(btn_self.values)-1:])
+
+            Plus = [a for a in btn_self.children if a.custom_id=="+"][0]
+            Minus = [b for b in btn_self.children if b.custom_id=="-"][0]
+            Multiply = [c for c in btn_self.children if c.custom_id=="*"][0]
+            Divide = [d for d in btn_self.children if d.custom_id=="/"][0]
+            Equals = [e for e in btn_self.children if e.custom_id=="="][0]
+
+            symbols = [Plus, Minus, Multiply, Divide, Equals]
+            if last in marker:
+                for symbol in symbols:
+                    symbol.disabled = True
+                return btn_self
+
+            elif not last in marker:
+                for symbol in symbols:
+                    symbol.disabled = False
+                return btn_self
+
+        def MakeEmbed(btn_self):
+            if btn_self.values == "":
+                btn_self.values = "0"
+            des = f'{str(btn_self.values)}' + ' '*30
+
+            button_Option = symbols_Button(btn_self)
+
+            if len(des) >= 31:
+                des = des[:31]
+                des2 = ""
+                if len(btn_self.values) == 30:
+                    des2 = '\n\n 계산기 범위를 벗어났습니다. \n계산이 정확히 되지 않을 수 있습니다.'
+            CalcEMV = discord.Embed(title=f"{BotName} 계산기", description='```\n'+des+'\n```'+des2, color=0xffdc16)
+            CalcEMV.set_thumbnail(url='https://cdn.discordapp.com/attachments/955355332983521300/962232633234948126/mathmu.png')
+            return CalcEMV, button_Option
+
+        class CalcView(discord.ui.View):
+            def __init__(self):
+                self.values = ""
+                super().__init__(timeout=None)
+
+            @discord.ui.button(label="9", style=discord.ButtonStyle.gray, row=0)
+            async def Nime(self, button: discord.ui.Button, interaction: discord.Interaction):
+                self.values += "9"
+                CalcEMV, button_Option = MakeEmbed(self)
+                await interaction.response.edit_message(embed=CalcEMV,view=button_Option)
+
+            @discord.ui.button(label="8", style=discord.ButtonStyle.gray, row=0)
+            async def Eight(self, button: discord.ui.Button, interaction: discord.Interaction):
+                self.values += "8"
+                CalcEMV, button_Option = MakeEmbed(self)
+                await interaction.response.edit_message(embed=CalcEMV,view=button_Option)
+
+            @discord.ui.button(label="7", style=discord.ButtonStyle.gray, row=0)
+            async def Seven(self, button: discord.ui.Button, interaction: discord.Interaction):
+                self.values += "7"
+                CalcEMV, button_Option = MakeEmbed(self)
+                await interaction.response.edit_message(embed=CalcEMV,view=button_Option)
+
+            @discord.ui.button(label="+", style=discord.ButtonStyle.blurple, row=0, custom_id="+")
+            async def Plus(self, button: discord.ui.Button, interaction: discord.Interaction):
+                self.values += "+"
+                CalcEMV, button_Option = MakeEmbed(self)
+                await interaction.response.edit_message(embed=CalcEMV,view=button_Option)
+
+            @discord.ui.button(label="Exit", style=discord.ButtonStyle.red, row=0)
+            async def Off(self, button: discord.ui.Button, interaction: discord.Interaction):
+                await interaction.response.edit_message(view=None)
+
+            @discord.ui.button(label="6", style=discord.ButtonStyle.gray, row=1)
+            async def Six(self, button: discord.ui.Button, interaction: discord.Interaction):
+                self.values += "6"
+                CalcEMV, button_Option = MakeEmbed(self)
+                await interaction.response.edit_message(embed=CalcEMV,view=button_Option)
+
+            @discord.ui.button(label="5", style=discord.ButtonStyle.gray, row=1)
+            async def Five(self, button: discord.ui.Button, interaction: discord.Interaction):
+                self.values += "5"
+                CalcEMV, button_Option = MakeEmbed(self)
+                await interaction.response.edit_message(embed=CalcEMV,view=button_Option)
+
+            @discord.ui.button(label="4", style=discord.ButtonStyle.gray, row=1)
+            async def Four(self, button: discord.ui.Button, interaction: discord.Interaction):
+                self.values += "4"
+                CalcEMV, button_Option = MakeEmbed(self)
+                await interaction.response.edit_message(embed=CalcEMV,view=button_Option)
+
+            @discord.ui.button(label="-", style=discord.ButtonStyle.blurple, row=1, custom_id="-")
+            async def Minus(self, button: discord.ui.Button, interaction: discord.Interaction):
+                self.values += "-"
+                CalcEMV, button_Option = MakeEmbed(self)
+                await interaction.response.edit_message(embed=CalcEMV,view=button_Option)
+
+            @discord.ui.button(label="C", style=discord.ButtonStyle.red, row=1, custom_id="C")
+            async def C(self, button: discord.ui.Button, interaction: discord.Interaction):
+                self.values = ""
+                CalcEMV, button_Option = MakeEmbed(self)
+                await interaction.response.edit_message(embed=CalcEMV,view=button_Option)
+
+            @discord.ui.button(label="3", style=discord.ButtonStyle.gray, row=2)
+            async def Three(self, button: discord.ui.Button, interaction: discord.Interaction):
+                self.values += "3"
+                CalcEMV, button_Option = MakeEmbed(self)
+                await interaction.response.edit_message(embed=CalcEMV,view=button_Option)
+
+            @discord.ui.button(label="2", style=discord.ButtonStyle.gray, row=2)
+            async def Two(self, button: discord.ui.Button, interaction: discord.Interaction):
+                self.values += "2"
+                CalcEMV, button_Option = MakeEmbed(self)
+                await interaction.response.edit_message(embed=CalcEMV,view=button_Option)
+
+            @discord.ui.button(label="1", style=discord.ButtonStyle.gray, row=2)
+            async def One(self, button: discord.ui.Button, interaction: discord.Interaction):
+                self.values += "1"
+                CalcEMV, button_Option = MakeEmbed(self)
+                await interaction.response.edit_message(embed=CalcEMV,view=button_Option)
+
+            @discord.ui.button(label="*", style=discord.ButtonStyle.blurple, row=2, custom_id="*")
+            async def Multiply(self, button: discord.ui.Button, interaction: discord.Interaction):
+                self.values += "*"
+                CalcEMV, button_Option = MakeEmbed(self)
+                await interaction.response.edit_message(embed=CalcEMV,view=button_Option)
+
+            @discord.ui.button(label="⌫", style=discord.ButtonStyle.red, row=2, custom_id="⌫")
+            async def Delete(self, button: discord.ui.Button, interaction: discord.Interaction):
+                self.values = self.values[:len(self.values)-1]
+                CalcEMV, button_Option = MakeEmbed(self)
+                await interaction.response.edit_message(embed=CalcEMV,view=button_Option)
+
+            @discord.ui.button(label="00", style=discord.ButtonStyle.gray, row=3)
+            async def twoZero(self, button: discord.ui.Button, interaction: discord.Interaction):
+                if not self.values == "":
+                    self.values += "00"
+                    CalcEMV, button_Option = MakeEmbed(self)
+                    await interaction.response.edit_message(embed=CalcEMV,view=button_Option)
+                else:
+                    return
+
+            @discord.ui.button(label="0", style=discord.ButtonStyle.gray, row=3)
+            async def Zero(self, button: discord.ui.Button, interaction: discord.Interaction):
+                if not self.values == "":
+                    self.values += "0"
+                    CalcEMV, button_Option = MakeEmbed(self)
+                    await interaction.response.edit_message(embed=CalcEMV,view=button_Option)
+                else:
+                    return
+
+            @discord.ui.button(label=".", style=discord.ButtonStyle.gray, row=3, custom_id=".")
+            async def Dot(self, button: discord.ui.Button, interaction: discord.Interaction):
+                if self.values == "":
+                    self.values += "0."
+                else:
+                    self.values += "."
+                CalcEMV, button_Option = MakeEmbed(self)
+                await interaction.response.edit_message(embed=CalcEMV,view=button_Option)
+
+            @discord.ui.button(label="/", style=discord.ButtonStyle.blurple, row=3, custom_id="/")
+            async def Divide(self, button: discord.ui.Button, interaction: discord.Interaction):
+                self.values += "/"
+                CalcEMV, button_Option = MakeEmbed(self)
+                await interaction.response.edit_message(embed=CalcEMV,view=button_Option)
+
+            @discord.ui.button(label="=", style=discord.ButtonStyle.green, row=3, custom_id="=")
+            async def Equals(self, button: discord.ui.Button, interaction: discord.Interaction):
+                self.values = str(eval(self.values))
+                CalcEMV, button_Option = MakeEmbed(self)
+                await interaction.response.edit_message(embed=CalcEMV,view=button_Option)
+
+        await ctx.respond(embed=CalcEMV, view=CalcView())
+
     @slash_command(description="유저가 한 말을 따라합니다.")
     async def 따라하기(self, ctx, 따라할말:Option(str,"봇이 따라할 말을 입력해주세요")):
         if "@everyone" in 따라할말 or "@here" in 따라할말:

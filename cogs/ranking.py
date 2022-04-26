@@ -20,11 +20,6 @@ class ranking(commands.Cog):
         summoner_id = summoner_v4["id"]
         summoner_level = summoner_v4["summonerLevel"]
 
-        print("="*50)
-        print(f"소환사명: {account_name}")
-        print(f"소환사ID: {summoner_id}\n계정ID: {account_id}")
-        print(f'소환사 레벨: {summoner_level}')
-        print("="*50)
         league_v4 = requests.get(f"https://kr.api.riotgames.com/lol/league/v4/entries/by-summoner/{summoner_id}?api_key={riotkey}").json()
         account_name_url = account_id.replace(" ","%20")
         try:
