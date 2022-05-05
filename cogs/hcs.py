@@ -62,38 +62,42 @@ def delete_info(DiscordID):
     else:
         return False
 
-
-def seconds_until(hours, minutes):
-    given_time = datetime.time(hours, minutes)
-    now = datetime.datetime.now()
-    future_exec = datetime.datetime.combine(now, given_time)
-    if (future_exec - now).days < 0:  # If we are past the execution, it will take place tomorrow
-        future_exec = datetime.datetime.combine(now + datetime.timedelta(days=1), given_time) # days always >= 0
-        return (future_exec - now).total_seconds()
-
 class hcs(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.Auto_check.start()
 
-    async def my_job_forever(self):
-        while True:  # Or change to self.is_running or some variable to control the task
-            await asyncio.sleep(seconds_until(7,10))  # Will stay here until your clock says 11:58
-            json_object = json.load(open(hcs_path,encoding="utf_8"))
-            for k, v in json_object.items():
-                if v[0]['Auto_check'] == "O":
-                    Nickname = v[0]['Nickname']
-                    Name = v[0]['Name']
-                    Birthday = v[0]['Birthday']
-                    Area = v[0]['Area']
-                    School = v[0]['School']
-                    School_lv = v[0]['School_lv']
-                    Password = v[0]['Password']
-                    hcskr_result = asyncSelfCheck(Name, Birthday, Area, School, School_lv, Password)
-                    if hcskr_result['code'] == 'SUCCESS':
-                        print(f"[자동화] {Nickname} : 자가진단 완료")
-                    else:
-                        print(f"[자동화] {Nickname} : 자가진단 실패")
-            await asyncio.sleep(60)  # Practical solution to ensure that the print isn't spammed as long as it is 11:58
+    @tasks.loop(seconds=40)
+    async def Auto_check(self):
+        select = str(datetime.time(7, 00).strftime("%H:%M"))
+        now = str(datetime.datetime.now().strftime("%H:%M"))
+        weekday = datetime.datetime.now().weekday()
+
+        weekend = [6, 7]
+        if not weekday in weekend:
+            if select == now:
+
+                json_object = json.load(open(hcs_path,encoding="utf_8"))
+                for k, v in json_object.items():
+                    if v[0]['Auto_check'] == "O":
+                        Nickname = v[0]['Nickname']
+                        Name = v[0]['Name']
+                        Birthday = v[0]['Birthday']
+                        Area = v[0]['Area']
+                        School = v[0]['School']
+                        School_lv = v[0]['School_lv']
+                        Password = v[0]['Password']
+
+                        hcskr_result = await asyncSelfCheck(Name, Birthday, Area, School, School_lv, Password)
+
+                        if hcskr_result['code'] == 'SUCCESS':
+                            print(f"{Nickname} : 자가진단 완료")
+                        else:
+                            print(f"{Nickname} : 자가진단 실패 - {hcskr_result['code']}")
+            else:
+                pass
+        else:
+            pass
 
 
     @slash_command(description="교육부 자가진단을 진행합니다.")

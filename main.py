@@ -90,8 +90,7 @@ async def 도움말(ctx, 플러그인:Option(str,"다음 중 하나를 선택하
 
     hcskrhelp = discord.Embed(title=f"자가진단 도움말", description=f"­", colour=0xffdc16)   
     hcskrhelp.add_field(name=f"/자가진단 실행", value=f":small_blue_diamond:"+"교육부 자가진단을 진행합니다.(정보 등록 필요)", inline=False)
-    hcskrhelp.add_field(name=f"/자가진단 예약", value=f":small_blue_diamond:"+"매일 오전 6시 자가진단을 진행합니다.", inline=False)
-    hcskrhelp.add_field(name=f"/자가진단 자동", value=f":small_blue_diamond:"+"매일 아침 6시에 자가진단을 진행합니다.(정보 등록 필요)", inline=False)
+    hcskrhelp.add_field(name=f"/자가진단 예약", value=f":small_blue_diamond:"+"매일 아침 7시에 자가진단을 진행합니다.(정보 등록 필요)", inline=False)
     hcskrhelp.add_field(name=f"/자가진단 등록", value=f":small_blue_diamond:"+"자가진단용 정보를 봇에 입력합니다.", inline=False)
     hcskrhelp.add_field(name=f"/자가진단 삭제", value=f":small_blue_diamond:"+"자가진단용 정보를 삭제합니다.", inline=False)
     hcskrhelp.set_thumbnail(url='https://cdn.discordapp.com/attachments/955355332983521300/961565520451235840/hcskr.png')
