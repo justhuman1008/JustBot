@@ -39,16 +39,17 @@ class enjoy(commands.Cog):
                 return btn_self
 
         def MakeEmbed(btn_self):
+            screen_num = btn_self
             if btn_self.values == "":
-                btn_self.values = "0"
-            des = f'{str(btn_self.values)}' + ' '*30
+                screen_num = "0"
+            des = f'{str(screen_num.values)}' + ' '*30
 
             button_Option = symbols_Button(btn_self)
 
             if len(des) >= 31:
                 des = des[:31]
                 des2 = ""
-                if len(btn_self.values) == 30:
+                if len(screen_num.values) == 30:
                     des2 = '\n\n 계산기 범위를 벗어났습니다. \n계산이 정확히 되지 않을 수 있습니다.'
             CalcEMV = discord.Embed(title=f"{BotName} 계산기", description='```\n'+des+'\n```'+des2, color=0xffdc16)
             CalcEMV.set_thumbnail(url='https://cdn.discordapp.com/attachments/955355332983521300/962232633234948126/mathmu.png')
@@ -185,6 +186,8 @@ class enjoy(commands.Cog):
                 self.values = str(eval(self.values))
                 CalcEMV, button_Option = MakeEmbed(self)
                 await interaction.response.edit_message(embed=CalcEMV,view=button_Option)
+                if self.values == "0":
+                    self.values = ""
 
         await ctx.respond(embed=CalcEMV, view=CalcView())
 
