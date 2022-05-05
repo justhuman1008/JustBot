@@ -3,8 +3,8 @@ from discord.commands import slash_command, Option
 from discord.ext import commands
 import requests
 
-import setting
-
+from setting import RiotAPIKey
+riotkey = RiotAPIKey
 
 class ranking(commands.Cog):
     def __init__(self, bot):
@@ -12,8 +12,6 @@ class ranking(commands.Cog):
 
     @slash_command(description="유저의 롤 티어를 불러옵니다.")
     async def 롤티어(self, ctx, 닉네임:Option(str,"롤 티어를 검색할 유저의 닉네임을 입력해주세요")):
-        riotkey = setting.RiotAPIKey
-
         summoner_v4 = requests.get(f"https://kr.api.riotgames.com/lol/summoner/v4/summoners/by-name/{닉네임}?api_key={riotkey}").json()
         account_name = summoner_v4["name"]
         account_id = summoner_v4["accountId"]

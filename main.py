@@ -4,12 +4,12 @@ from discord.ui import View
 from os import listdir
 from sys import exit
 
-from setting import token, owner, guild
+from setting import token, owner, guild, hcs_path
+BOT_token = token
 
 bot = discord.Bot()
 
-
-if token == "":
+if BOT_token == "":
     print("=========================")
     print("봇 계정 연결에 실패했습니다.")
     print("디스코드 봇의 토큰을 입력해주세요.")
@@ -182,6 +182,6 @@ async def invite(ctx):
 
 @bot.slash_command(guild_ids=[guild], description="봇에서 유저 DB를 다운받습니다.")
 async def db다운(ctx):
-    await ctx.respond(file=discord.File('hcs_info.json'))
+    await ctx.respond(file=discord.File(hcs_path))
 
-bot.run(token)
+bot.run(BOT_token)

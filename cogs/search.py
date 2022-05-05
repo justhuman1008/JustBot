@@ -8,17 +8,20 @@ from urllib.request import urlopen, Request
 import json
 from datetime import date, timedelta
 
-import setting
+from setting import covid19APIkey, NaverAPIID, NaverAPIPW
+client_id = NaverAPIID
+client_secret = NaverAPIPW
+servicekey = covid19APIkey
 
 
+hdr = {'User-agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko'}
 
 languagebox = {"ko":"한국어", "en":"영어", "ja":"일본어", "zh-CN":"중국어 간체", 
                 "zh-TW":"중국어 번체", "vi":"베트남어", "id":"인도네사아어", "th":"태국어",
                 "de":"독일어", "ru":"러시아어", "es":"스페인어", "it":"이탈리아어", "fr":"프랑스어"}
 unlanguagebox = { y:x for x,y in languagebox.items()}
 
-client_id = setting.NaverAPIID
-client_secret = setting.NaverAPIPW
+
 
 def getlang(text):
     # 언어 감지
@@ -102,8 +105,7 @@ class search(commands.Cog):
 
                 if beforelang == afterlang:
                     samelang = discord.Embed(title=f"동일한 언어가 선택되었습니다.", description=f"{번역할내용}은(는) {beforelang}로 {번역할내용}(...)입니다.", colour=0xffdc16)
-                    await dropdown.edit_original_message(embed=samelang,content=None)
-                    return
+                    return await dropdown.edit_original_message(embed=samelang,content=None)
                 
                 after = trans(번역할내용, before_langcode,after_langcode)
 
@@ -111,7 +113,7 @@ class search(commands.Cog):
                 papago.add_field(name=f"{beforelang}", value=f"{번역할내용}", inline=False)
                 papago.add_field(name=f"{afterlang}", value=f"{after}", inline=False)
                 papago.set_thumbnail(url='https://cdn.discordapp.com/attachments/955355332983521300/958683584284229672/papagonobg.png')
-                await dropdown.edit_original_message(embed=papago,content=None)
+                return await dropdown.edit_original_message(embed=papago,content=None)
 
             async def on_timeout(self):
                 await dropdown.delete_original_message()
@@ -121,7 +123,6 @@ class search(commands.Cog):
 
     @slash_command(description="대한민국의 코로나19 현황을 불러옵니다.")
     async def 코로나(self, ctx):
-        servicekey = setting.covid19APIkey
         if servicekey == "":
             await ctx.respond(embed=discord.Embed(title=f"해당 명령어는 사용 할 수 없습니다.", description=f"봇 관리자에게 문의하세요.", color=0xf8e71c))
             return
@@ -217,8 +218,6 @@ class search(commands.Cog):
 
     @slash_command(description="입력한 링크를 단축합니다.")
     async def 단축링크(self, ctx, 링크:Option(str,"단축할 링크를 입력해주세요.")):
-        client_id = setting.NaverAPIID
-        client_secret = setting.NaverAPIPW
         encText = urllib.parse.quote(링크)
         data = "url=" + encText
         url = "https://openapi.naver.com/v1/util/shorturl"
@@ -236,7 +235,6 @@ class search(commands.Cog):
 
     @slash_command(description="나무위키의 실시간 검색어를 불러옵니다.")
     async def 위키실검(self, ctx):
-        hdr = {"User-Agent": "Mozilla/5.0"}
         url = "https://search.namu.wiki/api/ranking"
         response = requests.get(url, headers=hdr)
 
@@ -264,8 +262,7 @@ class search(commands.Cog):
         melon.set_thumbnail(url='https://cdn.discordapp.com/attachments/955355332983521300/955382742550466600/1.png')
         targetSite = 'https://www.melon.com/chart/index.htm'
 
-        header = {'User-agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko'}
-        melonrqRetry = requests.get(targetSite, headers=header)
+        melonrqRetry = requests.get(targetSite, headers=hdr)
         melonht = melonrqRetry.text
         melonsp = BeautifulSoup(melonht, 'html.parser')
         artists = melonsp.findAll('span', {'class': 'checkEllipsis'})
@@ -284,8 +281,9 @@ class search(commands.Cog):
         output = json.loads(webpage)
         temp = output['temp']
         time = output['time']
-        if temp == "운전정지":
-            tempstop = discord.Embed(title=f"한강 수온을 불러올 수 없습니다.", description=f"API가 작동정지된 상태입니다.", color=0xffdc16)
+        other = ["운전정지", "장비점검"]
+        if temp in other:
+            tempstop = discord.Embed(title=f"한강 수온을 불러올 수 없습니다.", description=f"사유 {temp}", color=0xffdc16)
             await ctx.respond(embed=tempstop)
             return
         hanriver = discord.Embed(title=f"현재 한강 수온은 {temp}°C", description=f"들어가기 딱 좋은 온도", color=0xffdc16)
