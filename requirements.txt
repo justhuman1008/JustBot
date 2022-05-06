@@ -2,4 +2,3 @@ git+https://github.com/Pycord-Development/pycord
 asyncio
 requests
 bs4
-git+https://github.com/covid-hcs/hcs-python.git@main

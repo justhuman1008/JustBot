@@ -14,8 +14,6 @@ client_secret = NaverAPIPW
 servicekey = covid19APIkey
 
 
-hdr = {'User-agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko'}
-
 languagebox = {"ko":"한국어", "en":"영어", "ja":"일본어", "zh-CN":"중국어 간체", 
                 "zh-TW":"중국어 번체", "vi":"베트남어", "id":"인도네사아어", "th":"태국어",
                 "de":"독일어", "ru":"러시아어", "es":"스페인어", "it":"이탈리아어", "fr":"프랑스어"}
@@ -235,6 +233,7 @@ class search(commands.Cog):
 
     @slash_command(description="나무위키의 실시간 검색어를 불러옵니다.")
     async def 위키실검(self, ctx):
+        hdr = {"User-Agent": "Mozilla/5.0"}
         url = "https://search.namu.wiki/api/ranking"
         response = requests.get(url, headers=hdr)
 
@@ -258,19 +257,24 @@ class search(commands.Cog):
 
     @slash_command(description="멜론 차트 TOP10을 불러옵니다.")
     async def 멜론차트(self, ctx):
+        hdr = {'User-Agent': 'Mozilla/5.0'}
+        url = 'https://www.melon.com/chart/index.htm'
+
+        response = requests.get(url, headers=hdr)
+        text = response.text
+        soup = BeautifulSoup(text, 'html.parser')
+
+        artists = soup.findAll('span', {'class': 'checkEllipsis'})
+        albeoms = soup.findAll('div', {'class': 'ellipsis rank03'})
+        titles = soup.findAll('div', {'class': 'ellipsis rank01'})
+
         melon = discord.Embed(title="멜론 음악차트", description="[멜론차트 바로가기](https://www.melon.com/chart/index.htm)", color=0xffdc16)
         melon.set_thumbnail(url='https://cdn.discordapp.com/attachments/955355332983521300/955382742550466600/1.png')
-        targetSite = 'https://www.melon.com/chart/index.htm'
-
-        melonrqRetry = requests.get(targetSite, headers=hdr)
-        melonht = melonrqRetry.text
-        melonsp = BeautifulSoup(melonht, 'html.parser')
-        artists = melonsp.findAll('span', {'class': 'checkEllipsis'})
-        titles = melonsp.findAll('div', {'class': 'ellipsis rank01'})
         for i in range(10):
             artist = artists[i].text.strip()
+            albeom = albeoms[i].text.strip()
             title = titles[i].text.strip()
-            melon.add_field(name="{0:3d}위 : {1}".format(i + 1, title), value='{0} - {1}'.format(artist, title), inline=False)
+            melon.add_field(name=f"{i + 1}위 : {title}", value=f'{artist} - {albeom}', inline=False)
         await ctx.respond(embed=melon)
 
 

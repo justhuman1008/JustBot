@@ -4,7 +4,7 @@ from discord.ui import View
 from os import listdir
 from sys import exit
 
-from setting import token, owner, guild, hcs_path
+from setting import token, owner, guild
 BOT_token = token
 
 bot = discord.Bot()
@@ -34,14 +34,13 @@ for filename in listdir('./cogs'): # Cogs 자동 로드(봇 작동시)
 
 
 @bot.slash_command(description="봇 도움말 확인")
-async def 도움말(ctx, 플러그인:Option(str,"다음 중 하나를 선택하세요.", choices=["서버관리", "검색", "놀이", "마인크래프트", "자가진단", "봇"])=None):
+async def 도움말(ctx, 플러그인:Option(str,"다음 중 하나를 선택하세요.", choices=["서버관리", "검색", "놀이", "마인크래프트", "봇"])=None):
 
     help = discord.Embed(title=f"{bot.user.name} 도움말", description=f"­", colour=0xffdc16)
     help.add_field(name=f"서버관리", value=f"`/도움말 서버관리`", inline=True)
     help.add_field(name=f"검색", value=f"`/도움말 검색`", inline=True)
     help.add_field(name=f"놀이", value=f"`/도움말 놀이`", inline=True)
     help.add_field(name=f"마인크래프트", value=f"`/도움말 마인크래프트`", inline=True)
-    help.add_field(name=f"자가진단", value=f"`/도움말 자가진단`", inline=True)
     help.add_field(name=f"봇", value=f"`/도움말 봇`", inline=True)
     help.set_thumbnail(url=bot.user.display_avatar)
 
@@ -88,13 +87,6 @@ async def 도움말(ctx, 플러그인:Option(str,"다음 중 하나를 선택하
     minecrafthelp.add_field(name=f"/마크사양 `<권장,최소>`", value=f":small_blue_diamond:"+"마인크래프트 사양을 확인합니다.", inline=False)
     minecrafthelp.set_thumbnail(url='https://cdn.discordapp.com/attachments/955355332983521300/960085353404964884/minecraft.png')
 
-    hcskrhelp = discord.Embed(title=f"자가진단 도움말", description=f"­", colour=0xffdc16)   
-    hcskrhelp.add_field(name=f"/자가진단 실행", value=f":small_blue_diamond:"+"교육부 자가진단을 진행합니다.(정보 등록 필요)", inline=False)
-    hcskrhelp.add_field(name=f"/자가진단 예약", value=f":small_blue_diamond:"+"매일 아침 7시에 자가진단을 진행합니다.(정보 등록 필요)", inline=False)
-    hcskrhelp.add_field(name=f"/자가진단 등록", value=f":small_blue_diamond:"+"자가진단용 정보를 봇에 입력합니다.", inline=False)
-    hcskrhelp.add_field(name=f"/자가진단 삭제", value=f":small_blue_diamond:"+"자가진단용 정보를 삭제합니다.", inline=False)
-    hcskrhelp.set_thumbnail(url='https://cdn.discordapp.com/attachments/955355332983521300/961565520451235840/hcskr.png')
-
     bothelp = discord.Embed(title=f"봇 도움말", description=f"­", colour=0xffdc16)   
     bothelp.add_field(name=f"/ping", value=f":small_blue_diamond:"+"봇 레이턴시 확인", inline=False)
     bothelp.add_field(name=f"/정보", value=f":small_blue_diamond:"+"봇에 대한 정보를 출력합니다.", inline=False)
@@ -119,9 +111,6 @@ async def 도움말(ctx, 플러그인:Option(str,"다음 중 하나를 선택하
         if 플러그인 == "마인크래프트":
             await ctx.respond(embed=minecrafthelp)
             return
-        if 플러그인 == "자가진단":
-            await ctx.respond(embed=hcskrhelp)
-            return
         if 플러그인 == "봇":
             await ctx.respond(embed=bothelp)
             return
@@ -138,7 +127,6 @@ async def 명령어(ctx):
     cmdlist.add_field(name='검색', value='`/구글` `/네이버` `/번역` `/코로나` `/날씨` `/단축링크` `/위키실검` `/멜론차트` `/한강수온` `/롤티어`', inline=False)
     cmdlist.add_field(name="놀이", value='`/계산기` `/따라하기` `/주사위` `/숫자` `/소수`', inline=False)
     cmdlist.add_field(name="마인크래프트", value='`/uuid` `/스킨` `/서버상태` `/발전과제` `/마크사양`', inline=False)
-    cmdlist.add_field(name="자가진단", value="`/자가진단`", inline=False)
     cmdlist.add_field(name="봇", value="`/ping` `정보` `/invite` `/도움말` `/명령어`", inline=False)
     cmdlist.set_thumbnail(url=bot.user.display_avatar)
     await ctx.respond(embed=cmdlist)
@@ -178,9 +166,5 @@ async def invite(ctx):
     view.add_item(button)
 
     await ctx.respond(embed=invite,view=view)
-
-@bot.slash_command(guild_ids=[guild], description="봇에서 유저 DB를 다운받습니다.")
-async def db다운(ctx):
-    await ctx.respond(file=discord.File(hcs_path))
 
 bot.run(BOT_token)
