@@ -13,5 +13,3 @@ NaverAPIPW = os.environ['NaverPW']
 covid19APIkey = os.environ['Covidkey']
 
 RiotAPIKey = os.environ['Riotkey']
-
-#봇 공통사항----------------------------------------------------------------------------------------------
