@@ -61,6 +61,8 @@ class minecraft(commands.Cog):
             userPC1.add_field(name="OS",value="Windows: Windows 7 이상\nmacOS: Any 64-bit OS X using 10.9 Maverick or newer\nLinux: Any modern 64-bit distributions from 2014 onwards\n\nMinecraft 파일 최초 다운로드시 인터넷 연결이 필요하며, \n다운로드 이후 오프라인으로 플레이가 가능합니다.",inline=False)
             userPC1.set_thumbnail(url="https://cdn.discordapp.com/attachments/731471072310067221/874171555003912192/9aa60a6fb4157e44.jpg")
             await ctx.respond(embed=userPC1)
+
+        else:
             userPC2 = discord.Embed(title="Minecraft: Java Edition 시스템 요구 사항", description="권장 사양", color=0xffdc16)
             userPC2.add_field(name="CPU",value="Intel Core i5-4690 / AMD A10-7800 APU 또는 동급 장치",inline=False)
             userPC2.add_field(name="GPU",value="외장: GeForce 700 시리즈 / AMD Radeon Rx 200 시리즈",inline=False)
@@ -68,7 +70,6 @@ class minecraft(commands.Cog):
             userPC2.add_field(name="HDD",value="4GB(SSD 권장)",inline=False)
             userPC2.add_field(name="OS",value="Windows: Windows 10\nmacOS: macOS 10.12 Sierra\nLinux: Any modern distributions from 2014 onwards\n\nMinecraft 파일 최초 다운로드시 인터넷 연결이 필요하며, \n다운로드 이후 오프라인으로 플레이가 가능합니다.",inline=False)
             userPC2.set_thumbnail(url="https://cdn.discordapp.com/attachments/731471072310067221/874171555003912192/9aa60a6fb4157e44.jpg")
-        else:
             await ctx.respond(embed=userPC2)
 
 
