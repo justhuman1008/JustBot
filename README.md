@@ -9,11 +9,7 @@ Discord.py의 포크버전인 [Pycord](https://github.com/Pycord-Development/pyc
 
 개발자 디스코드: Just_human1008#8138
 
-<br>
-
 ### [**✉️ 봇 초대하기**](https://discord.com/oauth2/authorize?client_id=857814380749651998&permissions=137715076183&scope=bot%20applications.commands)
-
-<br>
 
 ### 봇 도움말(Beta 기준)
 <img src="/Image/help.png" alt ="Data" style="width: 500px;"/>  
