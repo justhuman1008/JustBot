@@ -10,9 +10,9 @@ class server(commands.Cog):
 
     @slash_command(description="이 서버에 대한 정보를 불러옵니다.")
     async def 서버정보(self, ctx):
-        current_guild: discord.Guild = ctx.guild
+        Guild:discord.Guild = ctx.guild
 
-        safety_settings = {"2FA Setting": current_guild.mfa_level,"verification level": current_guild.verification_level}
+        safety_settings = {"2FA Setting": Guild.mfa_level,"verification level": Guild.verification_level}
         # 보안 레벨
         if safety_settings['verification level'] == discord.VerificationLevel.none:
             safety_settings['verification level'] = "제한 없음"
@@ -27,20 +27,20 @@ class server(commands.Cog):
         
         # Embed
         roles = ctx.guild.roles
-        guild_info = discord.Embed(title=f"{current_guild.name}", colour=0xffdc16)
-        guild_info.add_field(name="서버 ID", value=f"`{current_guild.id}`", inline=True)
-        guild_info.add_field(name="서버 주인", value=f"`{current_guild.owner}`", inline=True)
+        guild_info = discord.Embed(title=f"{Guild.name}", colour=0xffdc16)
+        guild_info.add_field(name="서버 ID", value=f"`{Guild.id}`", inline=True)
+        guild_info.add_field(name="서버 주인", value=f"`{Guild.owner}`", inline=True)
         guild_info.add_field(name='서버 최고 역할', value=f'{roles[-1].mention}', inline=True)
-        guild_info.add_field(name="텍스트 채널 ", value=f"`{len(current_guild.text_channels)}개`", inline=True)
-        guild_info.add_field(name="음성 통화방 ", value=f"`{len(current_guild.voice_channels)}개`", inline=True)
+        guild_info.add_field(name="텍스트 채널 ", value=f"`{len(Guild.text_channels)}개`", inline=True)
+        guild_info.add_field(name="음성 통화방 ", value=f"`{len(Guild.voice_channels)}개`", inline=True)
         guild_info.add_field(name="카테고리 ", value=f"`{str(len(ctx.guild.categories))}개`", inline=True)
-        guild_info.add_field(name="유저", value=f"`{current_guild.member_count}명`", inline=True)
+        guild_info.add_field(name="유저", value=f"`{Guild.member_count}명`", inline=True)
         guild_info.add_field(name='역할수', value="`"+str(len(ctx.guild.roles)) + '개`', inline=True)
         guild_info.add_field(name="이모지 수", value =f'`{len(ctx.guild.emojis)}개`', inline=True)
         guild_info.add_field(name="서버 보안 수준", value=f"`{safety_settings['verification level']}`", inline=True)
-        guild_info.add_field(name ='부스트 레벨', value = f"`{current_guild.premium_tier}`", inline =True)
+        guild_info.add_field(name ='부스트 레벨', value = f"`{Guild.premium_tier}`", inline =True)
         guild_info.add_field(name="서버 생성 일자", value=f'`{ctx.guild.created_at.strftime("%Y-%m-%d %I")}`', inline=True)
-        guild_info.set_thumbnail(url=current_guild.icon)
+        guild_info.set_thumbnail(url=Guild.icon)
         await ctx.respond(embed=guild_info)
 
 
